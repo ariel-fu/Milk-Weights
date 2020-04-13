@@ -2,7 +2,11 @@ package application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-
+/**
+ * Main class that runs UI
+ * @author Alex, Ariel, Catherine, Harry, Prasun
+ *
+ */
 public class Main extends Application{
 
   @Override
