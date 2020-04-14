@@ -24,8 +24,8 @@ public class Milk {
    */
   public Milk(int weight, String date) {
     this.weight = weight;
+    this.date = date;
   }
-  
 
   /**
    * Set the weight to the input
