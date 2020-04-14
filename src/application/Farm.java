@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
 /**
  * 
  * This class models a Farm
@@ -42,7 +43,7 @@ public class Farm {
    * @return the Milk at that date
    */
   public Milk getMilk(String startDate, String date) {
-    int milkIndex = this.getIndexOfDate(startDate, date);
+    int milkIndex = this.getIndexOfDate(milks.get(0).getDate(), date);
     return milks.get(milkIndex);
   }
 
@@ -63,7 +64,7 @@ public class Farm {
    * @param year  - year specified by user
    * @return the total weight for the specified month and year
    */
-  public int getMonthTotal(int month, int year) {
+  public int getMonthTotal(String month, String year) {
     // TODO: implement
     return 0;
   }
@@ -73,10 +74,58 @@ public class Farm {
    * 
    * @param year - specified by the user
    * @return the total weight for the specified year
+   * @throws IllegalArgumentException - if the input is not valid
    */
-  public int getYearTotal(int year) {
-    // TODO: implement
+  public int getYearTotal(String year) throws IllegalArgumentException {
+    if (!validInput(year)) {
+      throw new IllegalArgumentException("Year is not within range!");
+    }
+    // else get the start year
+    String startDate = milks.get(0).getDate();
+    int[] dateArray = this.parseDate(startDate);
+    int startYear = dateArray[2];
+
+    // find Jan 1 with the same year as the input
+    // add milk weights until Dec 31
+
     return 0;
+  }
+
+  /**
+   * Validates the input that is either a year or a month
+   * 
+   * @param input - either a month or a year
+   * @return true if the input is within a valid rangeSSS
+   */
+  private boolean validInput(String input) {
+    // split the string and validate based on whether it is an month input or a
+    // year input
+    String[] parseInput = input.split("");
+    if (parseInput.length == 4) {
+      // a year -> convert to int and verify that it is less than the last
+      // input's year
+      int year = Integer.valueOf(input);
+      // get the last year from the milk list
+      int lastKnownYear = Integer
+          .valueOf(milks.get(milks.size() - 1).getDate());
+      if (year > lastKnownYear) {
+        return false;
+      } else {
+        return true;
+      }
+    } else if (parseInput.length == 2) {
+      // a month -> convert to int and verify that it is between 1 and 12
+      int month = Integer.valueOf(input);
+      if (month > 1 && month < 12) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // not valid, return false
+      return false;
+    }
+
   }
 
   /**
@@ -99,12 +148,12 @@ public class Farm {
    * @return an index that corresponds to the date
    */
   private int getIndexOfDate(String startDate, String date) {
-    int[] dateArray = this.getDateAsInt(date);
-    int[] startArray = this.getDateAsInt(startDate);
+    int[] dateArray = this.parseDate(date);
+    int[] startArray = this.parseDate(startDate);
     // get the difference in year, month, and day
-    int yearDifference = startArray[0] - dateArray[0];
+    int yearDifference = startArray[2] - dateArray[2];
     int monthDifference = startArray[1] - dateArray[1];
-    int dayDifference = startArray[2] - dateArray[2];
+    int dayDifference = startArray[0] - dateArray[0];
     int index = yearDifference + monthDifference + dayDifference;
     return index;
   }
@@ -113,16 +162,16 @@ public class Farm {
    * Takes in a date and returns [year, month, day] as ints
    * 
    * @param date - a date to "transform" into ints
-   * @return an array [year, month, day] as ints
+   * @return an array [day, month, year] as ints
    */
-  private int[] getDateAsInt(String date) {
+  private int[] parseDate(String date) {
     int[] dateArray = new int[3];
     // split the array up
     String[] split = date.split("/");
     // get the year
     String yearString = split[4] + split[5] + split[6] + split[7];
     int year = Integer.valueOf(yearString);
-    dateArray[0] = year;
+    dateArray[2] = year;
     // get the month
     String monthString = split[2] + split[3];
     int month = Integer.valueOf(monthString);
@@ -130,7 +179,7 @@ public class Farm {
     // get the day
     String dayString = split[0] + split[1];
     int day = Integer.valueOf(dayString);
-    dateArray[2] = day;
+    dateArray[0] = day;
     return dateArray;
   }
 
