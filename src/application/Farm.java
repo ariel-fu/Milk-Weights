@@ -1,8 +1,6 @@
 package application;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,7 +13,8 @@ import java.util.List;
  */
 public class Farm {
   private String ID;
-  private List<Milk> milks;
+  // TODO: change back to private after testing
+  protected List<Milk> milks;
 
   /**
    * No-arg constructor that inits the ID to empty string and the list of milk
@@ -41,7 +40,7 @@ public class Farm {
    * @param date - MM/DD/YYYY format
    * @return the Milk at that date
    */
-  public Milk getMilk(String startDate, String date) {
+  public Milk getMilk(String date) {
     int milkIndex = this.getIndexOfDate(date);
     return milks.get(milkIndex);
   }
@@ -150,15 +149,22 @@ public class Farm {
    * @return an index that corresponds to the date
    */
   private int getIndexOfDate(String date) {
-    String startDate = milks.get(0).getDate();
-    int[] dateArray = this.parseDate(date);
-    int[] startArray = this.parseDate(startDate);
-    // get the difference in year, month, and day
-    int yearDifference = startArray[2] - dateArray[2];
-    int monthDifference = startArray[1] - dateArray[1];
-    int dayDifference = startArray[0] - dateArray[0];
-    int index = yearDifference + monthDifference + dayDifference;
-    return index;
+    // if there are multiple milk objects in the list already, should not return
+    // 0... unless, of course, it is the first milk object
+    if (milks.size() > 1) {
+      String startDate = milks.get(0).getDate();
+      int[] dateArray = this.parseDate(date);
+      int[] startArray = this.parseDate(startDate);
+      // get the difference in year, month, and day between the date the user
+      // chose and the first date registered for this farm.
+      int yearDifference = dateArray[2] - startArray[2];
+      int monthDifference = dateArray[1] - startArray[1];
+      int dayDifference = dateArray[0] - startArray[0];
+      int index = yearDifference + monthDifference + dayDifference;
+      return index;
+    } else {
+      return 0; // only one object in the list
+    }
   }
 
   /**
@@ -171,18 +177,15 @@ public class Farm {
     int[] dateArray = new int[3];
     // split the array up
     String[] split = date.split("/");
-    // get the year
-    String yearString = split[4] + split[5] + split[6] + split[7];
-    int year = Integer.valueOf(yearString);
-    dateArray[2] = year;
-    // get the month
-    String monthString = split[2] + split[3];
-    int month = Integer.valueOf(monthString);
-    dateArray[1] = month;
-    // get the day
-    String dayString = split[0] + split[1];
-    int day = Integer.valueOf(dayString);
+    // get the day's int counter-part
+    int day = Integer.valueOf(split[0]);
     dateArray[0] = day;
+    // get the month's int counter-part
+    int month = Integer.valueOf(split[1]);
+    dateArray[1] = month;
+    // get the year's int counter-part
+    int year = Integer.valueOf(split[2]);
+    dateArray[2] = year;
     return dateArray;
   }
 
