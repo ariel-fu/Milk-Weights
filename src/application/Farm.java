@@ -75,7 +75,7 @@ public class Farm {
    * @return the total weight for the specified year
    */
   public int getYearTotal(int year) {
-    // TODO: implment
+    // TODO: implement
     return 0;
   }
 
