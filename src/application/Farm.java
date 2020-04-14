@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * 
  * This class models a Farm
@@ -43,7 +42,7 @@ public class Farm {
    * @return the Milk at that date
    */
   public Milk getMilk(String startDate, String date) {
-    int milkIndex = this.getIndexOfDate(milks.get(0).getDate(), date);
+    int milkIndex = this.getIndexOfDate(date);
     return milks.get(milkIndex);
   }
 
@@ -80,15 +79,18 @@ public class Farm {
     if (!validInput(year)) {
       throw new IllegalArgumentException("Year is not within range!");
     }
-    // else get the start year
-    String startDate = milks.get(0).getDate();
-    int[] dateArray = this.parseDate(startDate);
-    int startYear = dateArray[2];
+    // get the indexes of the start and end index
+    String startString = "01/01/" + year;
+    int startIndex = this.getIndexOfDate(startString);
+    String indexOfEnd = "12/31" + year;
+    int endIndex = this.getIndexOfDate(indexOfEnd);
 
-    // find Jan 1 with the same year as the input
-    // add milk weights until Dec 31
-
-    return 0;
+    int totalMilkWeight = 0; // stores total weight
+    // add milk weights from Jan 1 until Dec 31
+    for (int i = startIndex; i < endIndex; i++) {
+      totalMilkWeight += milks.get(i).getWeight();
+    }
+    return totalMilkWeight;
   }
 
   /**
@@ -147,7 +149,8 @@ public class Farm {
    * @param date - date of the index to be returned
    * @return an index that corresponds to the date
    */
-  private int getIndexOfDate(String startDate, String date) {
+  private int getIndexOfDate(String date) {
+    String startDate = milks.get(0).getDate();
     int[] dateArray = this.parseDate(date);
     int[] startArray = this.parseDate(startDate);
     // get the difference in year, month, and day
