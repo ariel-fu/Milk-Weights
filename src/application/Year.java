@@ -1,14 +1,11 @@
 package application;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
 
 /**
  * This class holds one year worth of milk
  * 
- * @author Ariel
+ * @author Alex, Ariel, Catherine, Harry, Prasun
  *
  */
 public class Year {
