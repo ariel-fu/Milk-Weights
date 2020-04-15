@@ -3,7 +3,9 @@ package application;
 import java.util.HashMap;
 
 /**
- * This class holds one year worth of milk
+ * This class holds one year worth of milk. Note, this HashMap does not insert
+ * in a sorted order. Since it uses the String date to map each Milk object, it
+ * is a O(1) look-up :)
  * 
  * @author Alex, Ariel, Catherine, Harry, Prasun
  *
@@ -22,20 +24,45 @@ public class Year {
     this.yearOfMilk = new HashMap<String, Milk>(366);
   }
 
-  public int getYearWorth() {
+  /**
+   * Returns which year this is
+   * 
+   * @return the year
+   */
+  public String getYear() {
+    return this.year;
+  }
+
+  /**
+   * Adds a milk to the year
+   * 
+   * @param milk - new milk to add to the year
+   */
+  public void addMilk(Milk milk) {
+    yearOfMilk.put(milk.getDate(), milk);
+  }
+
+  /**
+   * Gets the milk given the date
+   * 
+   * @param milkDate - date of the milk
+   * @return Milk object given the date
+   */
+  public Milk getMilk(String milkDate) {
+    return yearOfMilk.get(milkDate);
+  }
+
+  /**
+   * Gets the weight of a year worth of milk
+   * 
+   * @return the whole year's milk weight
+   */
+  public int getYearTotal() {
     int yearWorth = 0;
     for (int i = 0; i < yearOfMilk.size(); i++) {
       yearWorth += yearOfMilk.get(i).getWeight();
     }
     return yearWorth;
-  }
-
-  public void addMilk(Milk milk) {
-    yearOfMilk.put(milk.getDate(), milk);
-  }
-
-  public Milk getMilk(Milk milk) {
-    return yearOfMilk.get(milk.getDate());
   }
 
   /**
@@ -44,7 +71,7 @@ public class Year {
    * @param month - user given month
    * @return total milk weight
    */
-  public int getMonth(int month) {
+  public int getMonthTotal(int month) {
     int monthTotal = 0;
     // add the single digits first, need this because format is mm/dd/yyyy
     for (int i = 1; i < 10; i++) {
@@ -58,6 +85,44 @@ public class Year {
     }
     // return total
     return monthTotal;
+  }
+
+  /**
+   * Gets the total milk weight between the two date ranges
+   * 
+   * @param day1 - starting date
+   * @param day2 - last date
+   * @return the total milk weight between the two date ranges
+   */
+  public int getRange(String day1, String day2) {
+    String currDate = day1;
+    int totalWeight = 0;
+    // while the curr date is not the last date, add up the weights
+    while (!currDate.equals(day2)) {
+      // add the current Milk's weight to the total
+      totalWeight += yearOfMilk.get(currDate).getWeight();
+      // split the string into an array and get the next date
+      String[] splitDate = currDate.split("/");
+      currDate = this.getNextDate(splitDate);
+    }
+    // add the last date because the while loop won't get to it
+    totalWeight += yearOfMilk.get(day2).getWeight();
+    return totalWeight;
+  }
+
+  private String getNextDate(String[] currDate) {
+    int day = Integer.valueOf(currDate[1]);
+    int month = Integer.valueOf(currDate[0]);
+    int year = Integer.valueOf(currDate[2]);
+    int numDaysOfMonth = this.getNumberOfDays(month);
+    if (day++ > numDaysOfMonth) {
+      String date = (month + 1) + "/01/" + year;
+      return date;
+    } else {
+      String date = (month) + "/" + (day + 1) + "/" + year;
+      return date;
+    }
+
   }
 
   /**
