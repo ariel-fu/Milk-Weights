@@ -9,4 +9,15 @@ package application;
  */
 public abstract class ReportBase {
 
+  
+  abstract List<Double> drawReport();
+  
+  abstract double getAvg();
+  
+  abstract double getMin();
+  
+  abstract double getMax();
+  
+  abstract boolean validateInputs();
+  
 }
