@@ -8,6 +8,7 @@ Team Members:
 2. member: Alex Reichart, Lecture 002, areichart@wisc.edu
 3. member: Catherine Ge, Lecture 001, and cge24@wisc.edu
 4. member Harry Wang, lecture 002, and wang2476@wisc.edu
+5. member: Prasun Guragain, lecture 001, and guragain@wisc.edu
 
  
 
