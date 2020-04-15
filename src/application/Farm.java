@@ -83,7 +83,7 @@ public class Farm {
     // get the indexes of the start and end index
     String startString = "01/01/" + year;
     int startIndex = this.getIndexOfDate(startString);
-    String indexOfEnd = "12/31" + year;
+    String indexOfEnd = "12/31/" + year;
     int endIndex = this.getIndexOfDate(indexOfEnd);
 
     int totalMilkWeight = 0; // stores total weight
@@ -108,9 +108,10 @@ public class Farm {
       // a year -> convert to int and verify that it is less than the last
       // input's year
       int year = Integer.valueOf(input);
+      String lastYear = milks.get(milks.size() - 1).getDate();
+      int[] getYear = this.parseDate(lastYear);
       // get the last year from the milk list
-      int lastKnownYear = Integer
-          .valueOf(milks.get(milks.size() - 1).getDate());
+      int lastKnownYear = Integer.valueOf(getYear[2]);
       if (year > lastKnownYear) {
         return false;
       } else {
