@@ -34,8 +34,8 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-	Button save = new Button("Save");
-	Button remove = new Button("Remove");
+	Button save = new Button("Save");//Saved screen
+	Button remove = new Button("Remove");//Removed screen
 	Scene choice;
 
 	@Override
