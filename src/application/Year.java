@@ -11,7 +11,8 @@ import java.util.HashMap;
  *
  */
 public class Year {
-  private HashMap<String, Milk> yearOfMilk; // holds one year worth of milk
+  // TODO: change back to private
+  protected HashMap<String, Milk> yearOfMilk; // holds one year worth of milk
   private String year; // represents what year it is
 
   /**
@@ -58,11 +59,16 @@ public class Year {
    * @return the whole year's milk weight
    */
   public int getYearTotal() {
-    int yearWorth = 0;
-    for (int i = 0; i < yearOfMilk.size(); i++) {
-      yearWorth += yearOfMilk.get(i).getWeight();
+    int yearTotal = 0;
+    for (int month = 1; month < 13; month++) {
+      for (int i = 1; i < this.getNumberOfDays(month) + 1; i++) {
+        String currentDay = month + "/" + i + "/" + year;
+        yearTotal += yearOfMilk.get(currentDay).getWeight();
+      }
+
     }
-    return yearWorth;
+
+    return yearTotal;
   }
 
   /**
@@ -73,14 +79,9 @@ public class Year {
    */
   public int getMonthTotal(int month) {
     int monthTotal = 0;
-    // add the single digits first, need this because format is mm/dd/yyyy
-    for (int i = 1; i < 10; i++) {
-      String currentDay = month + "/" + "0" + i + "/" + year;
-      monthTotal += yearOfMilk.get(currentDay).getWeight();
-    }
-    // add the double digits next!
-    for (int i = 10; i < this.getNumberOfDays(month) + 1; i++) {
-      String currentDay = month + "/" + "0" + i + "/" + year;
+    // add all the days in tehe month
+    for (int i = 1; i < this.getNumberOfDays(month) + 1; i++) {
+      String currentDay = month + "/" + i + "/" + year;
       monthTotal += yearOfMilk.get(currentDay).getWeight();
     }
     // return total
@@ -105,8 +106,6 @@ public class Year {
       String[] splitDate = currDate.split("/");
       currDate = this.getNextDate(splitDate);
     }
-    // add the last date because the while loop won't get to it
-    totalWeight += yearOfMilk.get(day2).getWeight();
     return totalWeight;
   }
 
@@ -119,7 +118,7 @@ public class Year {
       String date = (month + 1) + "/01/" + year;
       return date;
     } else {
-      String date = (month) + "/" + (day + 1) + "/" + year;
+      String date = (month) + "/" + (day) + "/" + year;
       return date;
     }
 

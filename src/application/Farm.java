@@ -85,9 +85,17 @@ public class Farm {
           yearOfMilk = years.get(i);
         }
       }
+      // not in the list...
+      if (yearOfMilk == null) {
+        // create a new year and add to the list of years
+        yearOfMilk = new Year(dateParse[2]);
+        years.add(yearOfMilk);
+      }
       // add the milk, and done
       yearOfMilk.addMilk(new Milk(weight, date));
+
       return;
+
     }
   }
 
