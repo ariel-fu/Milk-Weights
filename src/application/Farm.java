@@ -1,5 +1,6 @@
 package application;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,6 @@ public class Farm {
   protected List<Year> years;
 
   /**
-   * No-arg constructor that inits the ID to empty string and the list of milk
-   */
-  public Farm() {
-    years = new ArrayList<Year>();
-    ID = "";
-  }
-
-  /**
    * Inits the List of milk and set the ID to the input
    * 
    * @param ID - ID of the Farm
@@ -35,32 +28,46 @@ public class Farm {
   }
 
   /**
+   * Gets the ID of the Farm
+   * 
+   * @return
+   */
+  public String getID() {
+    return this.ID;
+  }
+
+  /**
    * Gets the Milk at that date
    * 
    * @param date - MM/DD/YYYY format
    * @return the Milk at that date
    */
-  public Milk getMilk(String date) {
-    // get the year from the date
-    String[] dateParse = date.split("/");
-    // validate
-    if (!this.validInput(dateParse)) {
-      return null;
-    } else if (!this.validateYear(dateParse[2])) {
-      return null;
+  public Milk getMilk(LocalDate date) {
+    int year = date.getYear();
+
+    Year yearObj = this.getYear(year);
+    if (yearObj == null) {
+      return new Milk();
     } else {
-      // fortunately, we will never run into a NullPointerException because we
-      // already validated the year, and it is in the list of years :)
-      Year yearOfMilk = null;
-      // get the year from the list of years
-      for (int i = 0; i < years.size(); i++) {
-        if (years.get(i).getYear().equals(dateParse[2])) {
-          yearOfMilk = years.get(i);
-        }
-      }
-      // use that year to get the milk
-      return yearOfMilk.getMilk(date);
+      return yearObj.getMilk(date);
     }
+
+  }
+
+  /**
+   * Helper method that runs through the list of years to get the year specified
+   * 
+   * @param year - year specified
+   * @return null if the year is not in the list, otherwise, returns the Year
+   *         object
+   */
+  private Year getYear(int year) {
+    for (int i = 0; i < years.size(); i++) {
+      if (years.get(i).getYear() == year) {
+        return years.get(i);
+      }
+    }
+    return null;
   }
 
   /**
@@ -69,34 +76,17 @@ public class Farm {
    * @param weight - weight of the Milk
    * @param date   - the date associated with the milk
    */
-  public void addMilk(int weight, String date) {
-    // validate year
-    String[] dateParse = date.split("/");
-    // if invalid input, do nothing?? or throw exception, consult team
-    if (!this.validInput(dateParse)) {
-      return;
-    } else {
-      // fortunately, we will never run into a NullPointerException because we
-      // already validated the year, and it is in the list of years :)
-      Year yearOfMilk = null;
-      // get the year from the list of years
-      for (int i = 0; i < years.size(); i++) {
-        if (years.get(i).getYear().equals(dateParse[2])) {
-          yearOfMilk = years.get(i);
-        }
-      }
-      // not in the list...
-      if (yearOfMilk == null) {
-        // create a new year and add to the list of years
-        yearOfMilk = new Year(dateParse[2]);
-        years.add(yearOfMilk);
-      }
-      // add the milk, and done
-      yearOfMilk.addMilk(new Milk(weight, date));
-
-      return;
-
+  public void addMilk(int weight, LocalDate date) {
+    int yearDate = date.getYear();
+    Year year = this.getYear(yearDate);
+    if (year == null) {
+      // if the year does not exist, create a new year and add it to the list
+      year = new Year(yearDate);
+      years.add(year);
     }
+    // add the weight and the date to the specific year
+    year.addMilk(weight, date);
+    return;
   }
 
   /**
@@ -104,107 +94,85 @@ public class Farm {
    * 
    * @param month - month specified by user
    * @param year  - year specified by user
-   * @return the total weight for the specified month and year
+   * @return the total weight for the specified month and year, returns -1 for
+   *         invalid year or month
    */
-  public int getMonthTotal(String month, String year) {
-    // TODO: implement
-    return 0;
+  public int getMonthTotal(int month, int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getMonthTotal(month);
+    }
   }
 
   /**
    * Gets the total weight for the specified year
    * 
    * @param year - specified by the user
-   * @return the total weight for the specified year
+   * @return the total weight for the specified year, returns -1 for invalid
+   *         year
    */
-  public int getYearTotal(String year) {
-    // validate input
-    if (!this.validateYear(year)) {
+  public int getYearTotal(int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
       return -1;
+    } else {
+      return thisYear.getYearTotal();
     }
-    // fortunately, we will never run into a NullPointerException because we
-    // already validated the year, and it is in the list of years :)
-    Year yearOfMilk = null;
-    // get the year from the list of years
-    for (int i = 0; i < years.size(); i++) {
-      if (years.get(i).getYear().equals(year)) {
-        yearOfMilk = years.get(i);
-      }
-    }
-
-    // use the year to get the total for that year
-    return yearOfMilk.getYearTotal();
   }
 
   /**
    * Gets the total weight for a date range
    * 
-   * @param startDate - start date specified by the user
-   * @param endDate   - end date specified by the user
-   * @return the total weight of milk between the start date and the end date
+   * @param day1 - start date specified by the user
+   * @param day2 - end date specified by the user
+   * @return the total weight of milk between the start date and the end date,
+   *         -1 if either day's year is not in the list of years
    */
-  public int getRange(String startDate, String endDate) {
-    // validate both start and end dates
-    if (!this.validInput(startDate.split("/"))) {
-      return -1;
-    } else if (!this.validInput(endDate.split("/"))) {
-      return -1;
+  public int getRangeTotal(LocalDate day1, LocalDate day2) {
+    int rangeTotal = 0;
+    // see if it spans more than 1 year
+    if (day1.getYear() == day2.getYear()) {
+      Year year = this.getYear(day1.getYear());
+      if (year == null) {
+        return -1;
+      } else {
+        return year.getRange(day1, day2);
+      }
     } else {
-      // get year and validate (both years are the same bc implementing for one)
-      String[] getYear = startDate.split("/");
-      if (!this.validateYear(getYear[2])) {
+      // spans multiple years
+      Year year1 = this.getYear(day1.getYear());
+      Year year2 = this.getYear(day2.getYear());
+      // if either one of the years isn't in the list, return -1.
+      if (year1 == null || year2 == null) {
         return -1;
       }
-      Year year = null;
+      List<Year> listOfYears = new ArrayList<Year>();
+      // otherwise, track how many years are between them
       for (int i = 0; i < years.size(); i++) {
-        if (years.get(i).getYear().equals(year)) {
-          year = years.get(i);
+        Year currentYear = years.get(i);
+        // if the current year is between the start day and the end day, add it
+        // to the list
+        if (currentYear.getYear() > year1.getYear()
+            && currentYear.getYear() < year2.getYear()) {
+          listOfYears.add(years.get(i));
         }
       }
-      // return the total weight between days
-      return year.getRange(startDate, endDate);
-    }
 
-  }
-
-  /**
-   * Validates the date
-   * 
-   * @param dateParse - a String array in the format [mm, dd, yyyy]
-   * @return true if the date is valid, false otherwise
-   */
-  private boolean validInput(String[] dateParse) {
-    // two parts - day and month
-    if (dateParse.length != 3) {
-      return false;
-    }
-    // check the day
-    String day = dateParse[1];
-    if (Integer.valueOf(day) > 31) {
-      return false;
-    }
-    // check the month
-    String month = dateParse[0];
-    if (Integer.valueOf(month) > 12) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Validates the year
-   * 
-   * @param input - year
-   * @return true if the year is already in the
-   */
-  private boolean validateYear(String input) {
-    // check if the year given by the date is one of the years for this farm.
-    for (Year year : years) {
-      if (year.getYear().equals(input)) {
-        return true;
+      // add the difference between the start day and the end of the year
+      rangeTotal += year1.getRange(day1, LocalDate.of(year1.getYear(), 12, 31));
+      for (int i = 0; i < listOfYears.size(); i++) {
+        Year currYear = listOfYears.get(i);
+        LocalDate firstDay = LocalDate.of(currYear.getYear(), 1, 1);
+        LocalDate lastDay = LocalDate.of(currYear.getYear(), 12, 31);
+        rangeTotal += currYear.getRange(firstDay, lastDay);
       }
+      // add the weights between the first day of the year and day2
+      rangeTotal += year2.getRange(LocalDate.of(year2.getYear(), 1, 1), day2);
+      return rangeTotal;
+
     }
-    return false;
   }
 
 }
