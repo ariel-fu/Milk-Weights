@@ -1,0 +1,102 @@
+@startuml
+note top of Main: Reads from files, writes to the files, and runs GUI
+note bottom of FarmEditor: Allows user to be able to edit their data for a specific farm
+
+
+class Main{
+ - Map<String,Farm> farms
+ - FarmEditor editor
+ - CSVFile csv
+ - JSONFile json
+ - FarmReport farmReport
+ - AnnualReport annualReport
+ - MonthlyReport monthlyReport
+ - DateRangeReport dateRange
+}
+
+
+class FarmReport{
+ + year
+ + farmId
+ }
+class MonthlyReport{
+ + year
+ + month
+ }
+ 
+class AnnualReport{
+ + year
+ }
+ 
+class DateRangeReport{
+ + startDate
+ + endDate
+ }
+ 
+ abstract class ReportBase {
+	- Map<String,Farm> farms
+---
+ReportBase(Map<String,Farm> farms)
+---
+ 	+ {abstract} drawReport()
+ 	+ {abstract} boolean validateInputs()
+ 	--UI Methods--
+ 	+ show()
+ 	+ hide()
+ 	- refresh()
+ 	- clear()
+ }
+ 
+ FarmReport --|> ReportBase
+ DateRangeReport --|> ReportBase
+ AnnualReport --|> ReportBase
+ MonthlyReport --|> ReportBase
+
+Main *-- ReportBase
+
+note "ID, milks data, and methods needed by reports\nMilks stored in an array indexed by days from 1/1" as farmNote
+Farm .. farmNote
+class Farm{
+	- String ID
+	- Milk[] milks
+	---
+	Farm(ID)
+	---
+	+ Milk getMilk(date)
+	+ void addMilk(date, Milk milk)
+	
+	+ int getMonthTotal(int month)
+	+ int getYearTotal(int year)
+	+ int getTotal(startDate, endDate)
+}
+
+
+class Milk {
+- int weight
+---
++ Milk(int weight)
+---
+
++ setWeight(int weight)
++ getWeight()
+}
+
+Main "1" *-- "N" Farm
+Farm "1" *-- "365 or 366" Milk
+
+abstract class FarmFile {
+	- Map<String,Farm> farms
+	- FileIO io
+	+ load()
+	+ save()
+	+ addToFarmHelper(Farm farm, Date date, int weight)
+	{abstract} String farmToString(Farm farm)
+	{abstract} void addToFarms(String data)
+}
+
+CSVFile --|> FarmFile
+JSONFile --|> FarmFile
+FarmEditor --|> FarmFile
+Main *--  FarmFile
+Main "1" *-- "1" FarmEditor
+@enduml
