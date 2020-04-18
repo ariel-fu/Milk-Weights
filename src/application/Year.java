@@ -36,7 +36,6 @@ public class Year {
    * @return the year
    */
   public int getYear() {
-
     return this.year;
   }
 
@@ -112,6 +111,117 @@ public class Year {
       totalWeight += milks[i].getWeight();
     }
     return totalWeight;
+  }
+
+  /**
+   * Gets the max weight from this year
+   * 
+   * @return max weight, or 0 if the year is empty
+   */
+  public int getMaxWeightYear() {
+    int max = 0;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      if (currWeight > max) {
+        max = currWeight;
+      }
+    }
+    return max;
+  }
+
+  /**
+   * Gets the min weight from this year
+   * 
+   * @return the min weight
+   */
+  public int getMinWeightYear() {
+    int min = 1000000;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      if (currWeight < min) {
+        min = currWeight;
+      }
+    }
+    return min;
+  }
+
+  /**
+   * Gets the average for the year
+   * 
+   * @return the average as a double
+   */
+  public double getAvgWeightYear() {
+    double avg = 0;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      avg += currWeight;
+    }
+    return avg / milks.length;
+  }
+
+  /**
+   * Gets the min weight of a month
+   * 
+   * @param month - specified month
+   * @return the min weight of a specified month
+   */
+  public int getMinWeightMonth(int month) {
+    int minMonthWeight = 1000000;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+
+    // add all the days in the month
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      // if the current weight is less than the curr min, that will be the new
+      // min
+      if (currWeight < minMonthWeight) {
+        minMonthWeight = currWeight;
+      }
+    }
+    // return total
+    return minMonthWeight;
+  }
+
+  /**
+   * Get the max weight of a month
+   * 
+   * @param month - month to get the max weight
+   * @return gets the max weight of a month
+   */
+  public int getMaxWeightMonth(int month) {
+    int maxMonthWeight = 0;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      // if the current is greater than the previous max, set the new max to the
+      // current weight
+      if (currWeight > maxMonthWeight) {
+        maxMonthWeight = currWeight;
+      }
+    }
+    // return total
+    return maxMonthWeight;
+  }
+
+  public double getAvgWeightMonth(int month) {
+    double avg = 0;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+    // add all the days in the month
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      avg += currWeight;
+    }
+    return avg / milks.length;
   }
 
 }
