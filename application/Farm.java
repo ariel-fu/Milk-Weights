@@ -175,4 +175,99 @@ public class Farm {
     }
   }
 
+  /**
+   * Getter method for max weight in one year
+   * 
+   * @param year - user specified year
+   * @return the max weight for that year
+   */
+  public int getMaxWeightYear(int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getMaxWeightYear();
+    }
+  }
+
+  /**
+   * Getter method for the min weight in one year
+   * 
+   * @param year - user specifed year
+   * @return the min weight, -1 if the year is not in the list
+   */
+  public int getMinWeightYear(int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getMinWeightYear();
+    }
+  }
+
+  /**
+   * Getter method for the avg weight in one year
+   * 
+   * @param year - user specifed year
+   * @return the avg weight as a double, -1 if the year is not in the list
+   */
+  public double getAvgWeightYear(int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1.0;
+    } else {
+      return thisYear.getAvgWeightYear();
+    }
+  }
+
+  /**
+   * Getter method for the min weight of a month in a year
+   * 
+   * @param month - user specifed month
+   * @param year  - user specifed year
+   * @return -1 if the year is not in the list, min weight for the month
+   *         otherwise
+   */
+  public int getMinWeightMonth(int month, int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getMinWeightMonth(month);
+    }
+  }
+
+  /**
+   * Getter method for the max weight of a month in a year
+   * 
+   * @param month - user specified month
+   * @param year  - user specified year
+   * @return the max weight for the month in a year, -1 if the year does not
+   *         exist
+   */
+  public int getMaxWeightMonth(int month, int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getMaxWeightMonth(month);
+    }
+  }
+
+  /**
+   * Getter method for the average weight in that month of a specified year
+   * 
+   * @param month - user specified month
+   * @param year  - user specified year
+   * @return the average of a month for that year, -1 if the year does not exist
+   *         for this farm
+   */
+  public double getAvgWeightMonth(int month, int year) {
+    Year thisYear = this.getYear(year);
+    if (thisYear == null) {
+      return -1;
+    } else {
+      return thisYear.getAvgWeightMonth(month);
+    }
+  }
 }
