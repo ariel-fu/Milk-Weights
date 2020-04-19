@@ -1,6 +1,10 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class models an Annual Report requested by the user
@@ -9,37 +13,90 @@ import java.util.List;
  */
 public class AnnualReport extends ReportBase {
 
-	@Override
-	List<Double> getPercents() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private HashMap<String, Farm> farms;
+	private int year;
+	
+	
+	/**
+	 * Constructor, takes two arguments
+	 * @param farms - HashMap of all farms
+	 * @param year to take data from
+	 */
+	public AnnualReport(HashMap<String, Farm> farms, Year year) {
+		this.farms = farms;
+		this.year = year.getYear();
+	}
+	
+	/**
+	 * @return list of percents of each farm compared to total amount
+	 */
+	public List<Double> getPercents() {
+		List<Double> percents = new ArrayList<Double>();
+		double milkSum = 0;
+		Farm currFarm;
+		Iterator farmIt = farms.entrySet().iterator();
+		while(farmIt.hasNext()) {
+			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
+			milkSum += currFarm.getYearTotal(year);
+			percents.add((double)currFarm.getYearTotal(year));
+		}
+		for(int i = 0; i < percents.size(); i++) {
+			percents.set(i, percents.get(i) / milkSum);
+		}
+		return percents;
 	}
 
+	/**
+	 * @return average of all milk amounts
+	 */
+	public double getAvg() {
+		double milkSum = 0;
+		Farm currFarm;
+		Iterator farmIt = farms.entrySet().iterator();
+		while(farmIt.hasNext()) {
+			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
+			milkSum += currFarm.getYearTotal(year);
+		}
+		return milkSum / farms.size();
+	}
 
-	@Override
-	double getAvg() {
-		// TODO Auto-generated method stub
-		return 0;
+	/**
+	 * @return minimum of all milk amounts
+	 */
+	public double getMin() {
+		double minMilk = 1000;
+		Farm currFarm;
+		Iterator farmIt = farms.entrySet().iterator();
+		while(farmIt.hasNext()) {
+			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
+			if(currFarm.getYearTotal(year) < minMilk) {
+				minMilk = currFarm.getYearTotal(year);
+			}
+		}
+		return minMilk;
+	}
+
+	/**
+	 * @return maximum of all milk amounts
+	 */
+	public double getMax() {
+		double maxMilk = 0;
+		Farm currFarm;
+		Iterator farmIt = farms.entrySet().iterator();
+		while(farmIt.hasNext()) {
+			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
+			if(currFarm.getYearTotal(year) > maxMilk) {
+				maxMilk = currFarm.getYearTotal(year);
+			}
+		}
+		return maxMilk;
 	}
 
 	@Override
-	double getMin() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	double getMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	boolean validateInputs() {
+	public boolean validateInputs() {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-	
 
 }
