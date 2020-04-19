@@ -1,6 +1,6 @@
 package application;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 
 /**
  * This class holds one year worth of milk. Note, this HashMap does not insert
@@ -11,18 +11,23 @@ import java.util.HashMap;
  *
  */
 public class Year {
-  // TODO: change back to private
-  protected HashMap<String, Milk> yearOfMilk; // holds one year worth of milk
-  private String year; // represents what year it is
+
+  private int year; // represents what year it is
+  // TODO: change to private
+  protected Milk[] milks; // holds the milks for one year
 
   /**
    * Constructor that sets up the Year
    * 
    * @param year - represent the year
    */
-  public Year(String year) {
+  public Year(int year) {
     this.year = year;
-    this.yearOfMilk = new HashMap<String, Milk>(366);
+    // set initial capacity to 366 because of stupid leap years
+    milks = new Milk[366];
+    for (int i = 0; i < milks.length; i++) {
+      milks[i] = new Milk();
+    }
   }
 
   /**
@@ -30,7 +35,7 @@ public class Year {
    * 
    * @return the year
    */
-  public String getYear() {
+  public int getYear() {
     return this.year;
   }
 
@@ -39,8 +44,8 @@ public class Year {
    * 
    * @param milk - new milk to add to the year
    */
-  public void addMilk(Milk milk) {
-    yearOfMilk.put(milk.getDate(), milk);
+  public void addMilk(int weight, LocalDate date) {
+    milks[date.getDayOfYear()] = new Milk(weight);
   }
 
   /**
@@ -49,8 +54,8 @@ public class Year {
    * @param milkDate - date of the milk
    * @return Milk object given the date
    */
-  public Milk getMilk(String milkDate) {
-    return yearOfMilk.get(milkDate);
+  public Milk getMilk(LocalDate date) {
+    return milks[date.getDayOfYear()];
   }
 
   /**
@@ -60,12 +65,10 @@ public class Year {
    */
   public int getYearTotal() {
     int yearTotal = 0;
-    for (int month = 1; month < 13; month++) {
-      for (int i = 1; i < this.getNumberOfDays(month) + 1; i++) {
-        String currentDay = month + "/" + i + "/" + year;
-        yearTotal += yearOfMilk.get(currentDay).getWeight();
-      }
+    // get the year as an int
 
+    for (int i = 0; i < milks.length; i++) {
+      yearTotal += milks[i].getWeight();
     }
 
     return yearTotal;
@@ -79,10 +82,14 @@ public class Year {
    */
   public int getMonthTotal(int month) {
     int monthTotal = 0;
-    // add all the days in tehe month
-    for (int i = 1; i < this.getNumberOfDays(month) + 1; i++) {
-      String currentDay = month + "/" + i + "/" + year;
-      monthTotal += yearOfMilk.get(currentDay).getWeight();
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+    // add all the days in the month
+    for (int i = 0; i < max + 1; i++) {
+      // get the days in the month
+      monthTotal += milks[firstDay + i].getWeight();
     }
     // return total
     return monthTotal;
@@ -95,74 +102,126 @@ public class Year {
    * @param day2 - last date
    * @return the total milk weight between the two date ranges
    */
-  public int getRange(String day1, String day2) {
-    String currDate = day1;
+  public int getRange(LocalDate day1, LocalDate day2) {
+
     int totalWeight = 0;
+
     // while the curr date is not the last date, add up the weights
-    while (!currDate.equals(day2)) {
-      // add the current Milk's weight to the total
-      totalWeight += yearOfMilk.get(currDate).getWeight();
-      // split the string into an array and get the next date
-      String[] splitDate = currDate.split("/");
-      currDate = this.getNextDate(splitDate);
+    for (int i = day1.getDayOfYear(); i < day2.getDayOfYear() + 1; i++) {
+      totalWeight += milks[i].getWeight();
     }
     return totalWeight;
   }
 
-  private String getNextDate(String[] currDate) {
-    int day = Integer.valueOf(currDate[1]);
-    int month = Integer.valueOf(currDate[0]);
-    int year = Integer.valueOf(currDate[2]);
-    int numDaysOfMonth = this.getNumberOfDays(month);
-    if (day++ > numDaysOfMonth) {
-      String date = (month + 1) + "/01/" + year;
-      return date;
-    } else {
-      String date = (month) + "/" + (day) + "/" + year;
-      return date;
+  /**
+   * Gets the max weight from this year
+   * 
+   * @return max weight, or 0 if the year is empty
+   */
+  public int getMaxWeightYear() {
+    int max = 0;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      if (currWeight > max) {
+        max = currWeight;
+      }
     }
-
+    return max;
   }
 
   /**
-   * Helper method that returns the number of days for the given month
+   * Gets the min weight from this year
    * 
-   * @note this assumes that the month is valid. it will be checked in the Farm
-   *       class.
-   * @param month - given month, from the user
-   * @return number of days for the month given by the user
+   * @return the min weight
    */
-  private int getNumberOfDays(int month) {
-    if (month == 1) {
-      return 31;
-    } else if (month == 2) {
-      // leap year!
-      if (Integer.valueOf(year) % 4 == 0 && Integer.valueOf(year) % 100 != 0) {
-        return 29;
-      } else {
-        return 28;
+  public int getMinWeightYear() {
+    int min = 1000000;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      if (currWeight < min) {
+        min = currWeight;
       }
-    } else if (month == 3) {
-      return 31;
-    } else if (month == 4) {
-      return 30;
-    } else if (month == 5) {
-      return 31;
-    } else if (month == 6) {
-      return 30;
-    } else if (month == 7) {
-      return 31;
-    } else if (month == 8) {
-      return 31;
-    } else if (month == 9) {
-      return 30;
-    } else if (month == 10) {
-      return 31;
-    } else if (month == 11) {
-      return 30;
-    } else {
-      return 31;
     }
+    return min;
+  }
+
+  /**
+   * Gets the average for the year
+   * 
+   * @return the average as a double
+   */
+  public double getAvgWeightYear() {
+    double avg = 0;
+    for (int i = 0; i < milks.length; i++) {
+      int currWeight = milks[i].getWeight();
+      avg += currWeight;
+    }
+    return avg / milks.length;
+  }
+
+  /**
+   * Gets the min weight of a month
+   * 
+   * @param month - specified month
+   * @return the min weight of a specified month
+   */
+  public int getMinWeightMonth(int month) {
+    int minMonthWeight = 1000000;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+
+    // add all the days in the month
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      // if the current weight is less than the curr min, that will be the new
+      // min
+      if (currWeight < minMonthWeight) {
+        minMonthWeight = currWeight;
+      }
+    }
+    // return total
+    return minMonthWeight;
+  }
+
+  /**
+   * Get the max weight of a month
+   * 
+   * @param month - month to get the max weight
+   * @return gets the max weight of a month
+   */
+  public int getMaxWeightMonth(int month) {
+    int maxMonthWeight = 0;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      // if the current is greater than the previous max, set the new max to the
+      // current weight
+      if (currWeight > maxMonthWeight) {
+        maxMonthWeight = currWeight;
+      }
+    }
+    // return total
+    return maxMonthWeight;
+  }
+
+  public double getAvgWeightMonth(int month) {
+    double avg = 0;
+
+    LocalDate firstDate = LocalDate.of(this.year, month, 1);
+    int max = firstDate.lengthOfMonth();
+    int firstDay = firstDate.getDayOfYear();
+    // add all the days in the month
+    for (int i = 0; i < max + 1; i++) {
+      int currWeight = milks[firstDay + i].getWeight();
+      avg += currWeight;
+    }
+    return avg / milks.length;
   }
 
 }

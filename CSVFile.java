@@ -1,5 +1,7 @@
 package application;
 
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -33,88 +35,47 @@ public class CSVFile extends FarmFile {
     HashMap<String, Farm> hm = new HashMap<String, Farm>();
     while (scnr.hasNext()) {
       String next = scnr.next();
-      // CSV - comma separated values, separate by commas
-      String[] nextSplit = next.split(",");
-      // default is assuming line is invalid
-      boolean validLine = false;
-      while (validLine == false) {
-        // if the line is invalid, skip
-        if (nextSplit.length != 3) {
+      // CSV, split by a comma
+      String[] split = next.split(",");
+      boolean validDate = false;
+
+      // validate the date
+      LocalDate date = null;
+      while (!validDate && scnr.hasNext()) {
+        String currDate = split[0];
+        try {
+          date = LocalDate.parse(currDate);
+          // quit the loop
+          validDate = true;
+        } catch (DateTimeException e) {
+          // get the next line
           next = scnr.next();
-          nextSplit = next.split("-");
-        } else {
-          validLine = true;
-        }
-      }
-      // validate the date which will be at index 0
-      String date = nextSplit[0];
-      validLine = false;
-      if (!validateDate(date)) {
-        // skip the line if the date is not valid.
-        while (validLine == false) {
-          // if the line is invalid, skip
-          if (nextSplit.length != 3) {
-            next = scnr.next();
-            nextSplit = next.split("-");
-          } else {
-            validLine = true;
-          }
+          split = next.split(",");
         }
       }
 
-      // get a Farm object from the HashMap
-      // ID is at index 1, will accept anything
-      Farm farm = hm.get(date);
-      // hashmap returns null if it does not contain that date
-      if (farm == null) {
-        // create a new farm to use
-        // now, accepting all IDs
-        farm = new Farm(nextSplit[1]);
-      }
-      String weightString = nextSplit[2];
+      // validate the weight
+      //String strWeight = split[2];
+      String strWeight = "15";
       int weight;
       try {
-        weight = Integer.valueOf(weightString);
+        weight = Integer.valueOf(strWeight);
       } catch (NumberFormatException e) {
-        // it is okay, the user made a mistake! Don't we all? Add 0 for them.
+        // if the weight is invalid, set it to a default of 0 for them to come
+        // back to fix.
         weight = 0;
       }
-      // add the milk to the farm and add the farm to the hash map
+
+      // will accept any String ID
+      String ID = split[1];
+      Farm farm = new Farm(ID);
       farm.addMilk(weight, date);
-      hm.put(date, farm);
+      hm.put(ID, farm);
     }
     scnr.close();
     // return the hashmap
     return hm;
   }
 
-  /**
-   * Validates the date
-   * 
-   * @param date - date
-   * @return true if the date is good to go
-   */
-  private boolean validateDate(String date) {
-    String[] parseDate = date.split("-");
-    if (parseDate.length != 3) {
-      return false; // or throw exception?
-    } else {
-      try {
-        int month = Integer.valueOf(parseDate[1]);
-        int day = Integer.valueOf(parseDate[2]);
-        // invalid month
-        if (month > 12 || month < 1) {
-          return false;
-        } else if (day > 31 || day < 1) {
-          return false;
-        }
-      } catch (NumberFormatException e) {
-        // cannot cast from String to int
-        return false;
-      }
-    }
-    // everything is a-ok
-    return true;
-  }
-
+  // TODO: figure out how to write to a CSV file...
 }

@@ -13,8 +13,7 @@ public abstract class ReportBase {
 
   
   abstract List<Double> getPercents();
-  
-  abstract List<Double> drawReport();
+
   
   abstract double getAvg();
   
