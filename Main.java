@@ -464,12 +464,9 @@ public class Main extends Application {
 		ComboBox<String> yearCombo = 
 				new ComboBox<String>(
 						FXCollections.observableArrayList("Year"));//CHANGE MAYBE
-		Label space = new Label("          ");
-		Button reload = new Button("Reload");
-		HBox hBoxSpace = new HBox();
-		hBoxSpace.getChildren().addAll(space, reload);
+//		Button reload = new Button("Reload"); I DON'T THINK THIS IS NEEDED, CAUSE IT RESETS EVERYTIME COMBOBOX IS CHANGED.
 		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo, hBoxSpace);
+		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo);
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
