@@ -270,4 +270,12 @@ public class Farm {
       return thisYear.getAvgWeightMonth(month);
     }
   }
+
+  /**
+   * Returns a list of years from this Farm
+   * @return a list of years from this Farm
+   */
+  public List<Year> getListOfYears() {
+    return this.years;
+  }
 }
