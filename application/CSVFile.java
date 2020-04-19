@@ -55,7 +55,8 @@ public class CSVFile extends FarmFile {
       }
 
       // validate the weight
-      String strWeight = split[2];
+      //String strWeight = split[2];
+      String strWeight = "15";
       int weight;
       try {
         weight = Integer.valueOf(strWeight);
