@@ -37,7 +37,7 @@ public class MonthlyReport extends ReportBase {
 	public List<Double> getPercents() {
 		List<Double> percents = new ArrayList<Double>();
 		double milkSum = 0;
-		Farm currFarm;
+		Farm currFarm = null;
 		Iterator farmIt = farms.entrySet().iterator();
 		while(farmIt.hasNext()) {
 			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
@@ -55,7 +55,7 @@ public class MonthlyReport extends ReportBase {
 	 */
 	public double getAvg() {
 		double milkSum = 0;
-		Farm currFarm;
+		Farm currFarm = null;
 		Iterator farmIt = farms.entrySet().iterator();
 		while(farmIt.hasNext()) {
 			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
@@ -69,7 +69,7 @@ public class MonthlyReport extends ReportBase {
 	 */
 	public double getMin() {
 		double minMilk = 1000;
-		Farm currFarm;
+		Farm currFarm = null;
 		Iterator farmIt = farms.entrySet().iterator();
 		while(farmIt.hasNext()) {
 			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
@@ -85,7 +85,7 @@ public class MonthlyReport extends ReportBase {
 	 */
 	public double getMax() {
 		double maxMilk = 0;
-		Farm currFarm;
+		Farm currFarm = null;
 		Iterator farmIt = farms.entrySet().iterator();
 		while(farmIt.hasNext()) {
 			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
