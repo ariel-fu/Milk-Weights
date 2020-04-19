@@ -1,8 +1,14 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,10 +39,34 @@ import javafx.stage.Stage;
  *
  */
 public class Main extends Application {
-
-	Button save = new Button("Save");//Saved screen
-	Button remove = new Button("Remove");//Removed screen
+	Button save = new Button("Save");// Saved screen
+	Button remove = new Button("Remove");// Removed screen
 	Scene choice;
+	CSVFile csv = new CSVFile();
+	String fileName = "";
+	HashMap<String, Farm> hashMap = null;
+
+	// Gets the sixth scene, Edit data
+	Scene sixthScene = null;
+	// Gets the fifth scene, Data Range Report
+	Scene fifthScene = null;
+	// Gets the forth scene, Monthly report
+	Scene forthScene = null;
+	// Gets the third scene, Annual Report
+	Scene thirdScene = null;
+	// Gets the second scene, farm report
+	Scene secondScene = null;
+
+	Button farm = new Button("Farm Report");
+	Button month = new Button("Month Report");
+	Button annual = new Button("Annual Report");
+	Button data = new Button("Data Range Report");
+	Button edit = new Button("Edit Data");
+	boolean flag = true;
+
+	ArrayList<Farm> allFarms;
+
+	ComboBox<Farm> farmCombo;
 
 	@Override
 	public void start(Stage arg0) throws Exception {
@@ -44,12 +74,75 @@ public class Main extends Application {
 		savedScene(arg0);
 		removedScene(arg0);
 
+		BorderPane root = new BorderPane();
+
+		// Title and welcome sign
+		Text text = new Text();
+		text.setText("Milk Weights");
+		text.setFill(Color.BLACK);
+		text.setStyle("-fx-font: 40 arial;");
+		Label lable2 = new Label("Welcome! Start by entering the file name below, click Submit,"
+				+ "then click Continue");
+
+		// Type input and submit
+		Button continueButton = new Button("Continue");
+		TextField textField = new TextField();
+		Button button = new Button("Submit");
+		button.setOnAction(e -> {
+			fileName = textField.getText();
+			choiceScene(arg0, continueButton);
+		});
+
+		VBox vBoxFirstScene = new VBox();
+		vBoxFirstScene.getChildren().addAll(text, lable2, textField, button, continueButton);
+		vBoxFirstScene.setAlignment(Pos.CENTER);
+
+		// Return first scene
+		root.setCenter(vBoxFirstScene);
+
 		// The first scene
-		BorderPane root = this.getFirstScene(arg0, choicesScene(arg0));
-		Scene mainScene = new Scene(root, 300, 200);
+		Scene mainScene = new Scene(root, 450, 200);
 		arg0.setTitle("Milk Weights");
 		arg0.setScene(mainScene);
 		arg0.show();
+
+	}
+
+	/**
+	 * Returns the choice scene
+	 * 
+	 * @param arg0        - the arg
+	 * @param secondScene - the second scene
+	 * @return the first scene, input file name
+	 * @throws InterruptedException
+	 */
+	public Scene choiceScene(Stage arg0, Button continueButton) {
+		continueButton.setOnAction(e -> arg0.setScene(choice));
+
+		// Choices scene
+		HBox hBox = new HBox();
+		hBox.getChildren().addAll(farm, month, annual, data, edit);
+		VBox vBox = new VBox();
+		Button close = new Button("Close");
+		vBox.getChildren().addAll(new Label("Choose one: "), hBox, close);
+		choice = new Scene(vBox, 500, 100);
+
+		// Which button or choice in combo box was pressed
+		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0, choice)));
+		farmCombo.setOnAction(e -> {
+			for (int i = 0; i < hashMap.size(); i++) {
+				if (farmCombo.getValue() == allFarms.get(i)) {
+					arg0.setScene(
+							this.getSecondSceneOnceAFarmIsChosen(arg0, farmCombo, allFarms.get(i)));
+				}
+			}
+		});
+		edit.setOnAction(e -> arg0.setScene(getSixthScene(arg0, choice)));
+		data.setOnAction(e -> arg0.setScene(getFifthScene(arg0, choice)));
+		month.setOnAction(e -> arg0.setScene(getForthScene(arg0, choice)));
+		annual.setOnAction(e -> arg0.setScene(getThirdScene(arg0, choice)));
+		close.setOnAction(e -> arg0.close());
+		return choice;
 	}
 
 	public Scene savedScene(Stage arg0) {
@@ -84,45 +177,15 @@ public class Main extends Application {
 		return removedScene;
 	}
 
-	public Scene choicesScene(Stage arg0) {
-		// Choices scene
-		Button farm = new Button("Farm Report");
-		Button month = new Button("Month Report");
-		Button annual = new Button("Annual Report");
-		Button data = new Button("Data Range Report");
-		Button edit = new Button("Edit Data");
-		HBox hBox = new HBox();
-		hBox.getChildren().addAll(farm, month, annual, data, edit);
-		VBox vBox = new VBox();
-		Button close = new Button("Close");
-		vBox.getChildren().addAll(new Label("Choose one: "), hBox, close);
-		choice = new Scene(vBox, 500, 100);
-
-		// Gets the sixth scene, Edit data
-		Scene sixthScene = getSixthScene(arg0, choice);
-		// Gets the fifth scene, Data Range Report
-		Scene fifthScene = getFifthScene(arg0, choice);
-		// Gets the forth scene, Monthly report
-		Scene forthScene = getForthScene(arg0, choice);
-		// Gets the third scene, Annual Report
-		Scene thirdScene = getThirdScene(arg0, choice);
-		// Gets the second scene, farm report
-		Scene secondScene = getSecondScene(arg0, choice);
-
-		// Which choice was pressed
-		farm.setOnAction(e -> arg0.setScene(secondScene));
-		month.setOnAction(e -> arg0.setScene(forthScene));
-		annual.setOnAction(e -> arg0.setScene(thirdScene));
-		data.setOnAction(e -> arg0.setScene(fifthScene));
-		edit.setOnAction(e -> arg0.setScene(sixthScene));
-		close.setOnAction(e -> arg0.close());
-		return choice;
-	}
-	
 	public PieChart getPieChartWithFarm() {
-		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-				new PieChart.Data("Farm1", 10), new PieChart.Data("Farm2", 20),
-				new PieChart.Data("Farm3", 30), new PieChart.Data("Farm4", 40));
+		int numOfFarms = 5; // Need to figure out how to get the number of farms
+		// Need to figure out how to get what farm they and how much percent
+		//List<Double> percent = farmReport.getPercents();
+		PieChart.Data pieChart = new PieChart.Data("Farm", 200);
+		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+		for (int i = 0; i < 5; i++) {// NEED TO CHANGE SIZE
+			pieChartData = FXCollections.observableArrayList(pieChart);
+		}
 		PieChart chart = new PieChart(pieChartData);
 		return chart;
 	}
@@ -144,7 +207,7 @@ public class Main extends Application {
 		return vbox;
 	}
 
-	public BarChart getBarChart() {
+	public BarChart getBarChart(Farm chosenFarm) {
 		// Bar Chart
 		CategoryAxis xAxis = new CategoryAxis();
 		xAxis.setLabel("");
@@ -153,10 +216,12 @@ public class Main extends Application {
 		BarChart barChart = new BarChart(xAxis, yAxis);
 		XYChart.Series dataSeries1 = new XYChart.Series();
 		dataSeries1.setName("Milk Weights");
-		dataSeries1.getData().add(new XYChart.Data("Min", 100));
-		dataSeries1.getData().add(new XYChart.Data("Average", 200));
-		dataSeries1.getData().add(new XYChart.Data("Max", 300));
-		dataSeries1.getData().add(new XYChart.Data("Total", 400));
+
+		// Making the bar chart from info from FarmReport
+		FarmReport farmReport = new FarmReport(chosenFarm, 2019);//CHANGE YEAR MAYBE
+		dataSeries1.getData().add(new XYChart.Data("Min", farmReport.getMin()));
+		dataSeries1.getData().add(new XYChart.Data("Average", farmReport.getAvg()));
+		dataSeries1.getData().add(new XYChart.Data("Max", farmReport.getMax()));
 		barChart.getData().add(dataSeries1);
 		return barChart;
 	}
@@ -166,18 +231,21 @@ public class Main extends Application {
 		goBack.setOnAction(e -> arg0.setScene(choice));
 		return goBack;
 	}
-	
-	public PieChart getPieChartWithMonth() {
+
+	public PieChart getPieChartWithMonth(Farm chosenFarm) {
+		FarmReport farmReport = new FarmReport(chosenFarm, 2019);
+		List<Double> percentage = farmReport.getPercents();
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-				new PieChart.Data("Jan", 5), new PieChart.Data("Feb", 10),
-				new PieChart.Data("Mar", 5), new PieChart.Data("Apr", 15),
-				new PieChart.Data("May", 10), new PieChart.Data("Jun", 5),
-				new PieChart.Data("Jul", 15), new PieChart.Data("Aug", 5),
-				new PieChart.Data("Sep", 10), new PieChart.Data("Oct", 5),
-				new PieChart.Data("Nov", 10), new PieChart.Data("Dec", 10));
+				new PieChart.Data("Jan", percentage.get(0)), new PieChart.Data("Feb", percentage.get(1)),
+				new PieChart.Data("Mar", percentage.get(2)), new PieChart.Data("Apr", percentage.get(3)),
+				new PieChart.Data("May", percentage.get(4)), new PieChart.Data("Jun", percentage.get(5)),
+				new PieChart.Data("Jul", percentage.get(6)), new PieChart.Data("Aug", percentage.get(7)),
+				new PieChart.Data("Sep", percentage.get(8)), new PieChart.Data("Oct", percentage.get(9)),
+				new PieChart.Data("Nov", percentage.get(10)), new PieChart.Data("Dec", percentage.get(11)));
 		PieChart chart = new PieChart(pieChartData);
 		return chart;
 	}
+
 	/**
 	 * Returns the fifth scene, Edit data
 	 * 
@@ -186,7 +254,7 @@ public class Main extends Application {
 	 * @return the fifth scene, Edit data
 	 */
 	public Scene getSixthScene(Stage arg0, Scene choice) {
-		Scene sixthScene;
+		// Scene sixthScene;
 
 		Text sixthText = new Text();
 		sixthText.setText("Edit your farm data");
@@ -194,7 +262,7 @@ public class Main extends Application {
 		sixthText.setStyle("-fx-font: 20 arial;");
 
 		Text input = new Text();
-		input.setText("Input your data");
+		input.setText("Input your data:");
 		input.setFill(Color.BLACK);
 		input.setStyle("-fx-font: 10 arial;");
 
@@ -223,8 +291,8 @@ public class Main extends Application {
 		saveRemove.getChildren().addAll(this.save, spacing, this.remove);
 
 		VBox sixthBox = new VBox();
-		sixthBox.getChildren().addAll(sixthText, input, farm, calendar, inputWeight, 
-				saveRemove, goBack(arg0));
+		sixthBox.getChildren().addAll(sixthText, input, farm, calendar, inputWeight, saveRemove,
+				goBack(arg0));
 
 		// Return second scene
 		sixthScene = new Scene(sixthBox, 250, 200);
@@ -239,7 +307,7 @@ public class Main extends Application {
 	 * @return the fifth scene, Data Range Report
 	 */
 	public Scene getFifthScene(Stage arg0, Scene choice) {
-		Scene fifthScene;
+		// Scene fifthScene;
 		Text fifthText = new Text();
 		fifthText.setText("Data Range Report");
 		fifthText.setFill(Color.BLACK);
@@ -263,7 +331,7 @@ public class Main extends Application {
 		pieChart.setTitle("Annual Percentage");
 		HBox charts = new HBox();
 		charts.getChildren().addAll(getTable(), pieChart);
-		
+
 		// Go back to choices
 		VBox fifthBox = new VBox();
 		fifthBox.getChildren().addAll(fifthText, calendar, reload, charts, goBack(arg0));
@@ -281,7 +349,7 @@ public class Main extends Application {
 	 * @return the forth scene, monthly report
 	 */
 	public Scene getForthScene(Stage arg0, Scene choice) {
-		Scene forthScene;
+		// Scene forthScene;
 		Text forthText = new Text();
 		forthText.setText("Monthly Report");
 		forthText.setFill(Color.BLACK);
@@ -306,8 +374,8 @@ public class Main extends Application {
 		pieChart1.setTitle("Annual Percentage");
 		pieChart2.setTitle("Monthly Percentage");
 		HBox charts = new HBox();
-		charts.getChildren().addAll(getBarChart(), pieChart1, pieChart2);
-		
+		charts.getChildren().addAll(getBarChart(new Farm("NOT IT")), pieChart1, pieChart2);//CHANGE! THE NEW FARM PART
+
 		Label spacing = new Label(
 				"                                                                      ");
 		HBox tableSpace = new HBox();
@@ -330,7 +398,7 @@ public class Main extends Application {
 	 * @return the third scene, annual report
 	 */
 	public Scene getThirdScene(Stage arg0, Scene choice) {
-		Scene thirdScene;
+		// Scene thirdScene;
 		Text thirdText = new Text();
 		thirdText.setText("Annual Report");
 		thirdText.setFill(Color.BLACK);
@@ -372,19 +440,30 @@ public class Main extends Application {
 	 */
 	public Scene getSecondScene(Stage arg0, Scene choice) {
 		// SECOND SCENE
-		Scene secondScene;
+		hashMap = csv.parseFile(fileName);
+		int numOfFarms = hashMap.size();
+		allFarms = new ArrayList<Farm>();
+		for (int i = 0; i < numOfFarms; i++) {
+			allFarms.add(hashMap.get(i));
+		}
+
+		// ComboBox
+		farmCombo = new ComboBox<Farm>();
+		for (int i = 0; i < numOfFarms; i++) {
+			farmCombo = new ComboBox<Farm>(FXCollections.observableArrayList(allFarms));
+		}
+
 		Text secondText = new Text();
 		secondText.setText("Farm Report");
 		secondText.setFill(Color.BLACK);
 		secondText.setStyle("-fx-font: 20 arial;");
 
-		// ComboBox
 		Label farm = new Label("Farm     ");
-		ComboBox<String> farmCombo = new ComboBox<String>(
-				FXCollections.observableArrayList("Farm1", "Farm2", "Farm3"));
+
 		Label year = new Label("          Year     ");
-		ComboBox<String> yearCombo = new ComboBox<String>(
-				FXCollections.observableArrayList("Year1", "Year2", "Year3"));
+		ComboBox<String> yearCombo = 
+				new ComboBox<String>(
+						FXCollections.observableArrayList("Year"));//CHANGE MAYBE
 		Label space = new Label("          ");
 		Button reload = new Button("Reload");
 		HBox hBoxSpace = new HBox();
@@ -392,11 +471,40 @@ public class Main extends Application {
 		HBox hBoxAll = new HBox();
 		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo, hBoxSpace);
 
+		// Go back to choices
+		VBox secondVBox = new VBox();
+		secondVBox.getChildren().addAll(secondText, hBoxAll, goBack(arg0));
+
+		// Return second scene
+		secondScene = new Scene(secondVBox, 1000, 1500);
+		return secondScene;
+	}
+
+	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, ComboBox<Farm> farmCombo,
+			Farm chosenFarm) {
 		// Pie Chart
-		PieChart chart =  this.getPieChartWithMonth();
+		PieChart chart = this.getPieChartWithMonth(chosenFarm);
 		chart.setTitle("Month Percentage");
 		HBox charts = new HBox();
-		charts.getChildren().addAll(this.getBarChart(), chart);
+		charts.getChildren().addAll(this.getBarChart(chosenFarm), chart);
+		
+		Text secondText = new Text();
+		secondText.setText("Farm Report");
+		secondText.setFill(Color.BLACK);
+		secondText.setStyle("-fx-font: 20 arial;");
+
+		Label farm = new Label("Farm     ");
+
+		Label year = new Label("          Year     ");
+		ComboBox<String> yearCombo = 
+				new ComboBox<String>(
+						FXCollections.observableArrayList(String.valueOf("2019")));//CHANGE MAYBE
+		Label space = new Label("          ");
+		Button reload = new Button("Reload");
+		HBox hBoxSpace = new HBox();
+		hBoxSpace.getChildren().addAll(space, reload);
+		HBox hBoxAll = new HBox();
+		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo, hBoxSpace);
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
@@ -405,38 +513,6 @@ public class Main extends Application {
 		// Return second scene
 		secondScene = new Scene(secondVBox, 1000, 1500);
 		return secondScene;
-	}
-
-	/**
-	 * Returns the first scene, input file name
-	 * 
-	 * @param arg0        - the arg
-	 * @param secondScene - the second scene
-	 * @return the first scene, input file name
-	 */
-	public BorderPane getFirstScene(Stage arg0, Scene choice) {
-		// FIRST SCENE
-		BorderPane root = new BorderPane();
-
-		// Title and welcome sign
-		Text text = new Text();
-		text.setText("Milk Weights");
-		text.setFill(Color.BLACK);
-		text.setStyle("-fx-font: 40 arial;");
-		Label lable2 = new Label("Welcome! Start by entering the file name below:");
-
-		// Type input and submit
-		TextField textField = new TextField();
-		Button button = new Button("Submit");
-		button.setOnAction(e -> arg0.setScene(choice));
-
-		VBox vBox = new VBox();
-		vBox.getChildren().addAll(text, lable2, textField, button);
-		vBox.setAlignment(Pos.CENTER);
-
-		// Return first scene
-		root.setCenter(vBox);
-		return root;
 	}
 
 	/**
