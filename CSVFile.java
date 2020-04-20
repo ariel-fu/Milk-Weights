@@ -1,9 +1,10 @@
 package application;
 
-import java.time.DateTimeException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * This class models a reader for CSV files. Should be able to parse and send
@@ -29,34 +30,45 @@ public class CSVFile extends FarmFile {
    * 
    * @param fileName - file given by the user, hopefully
    * @return a HashMap with all the farms and their corresponding data added.
+   * @throws IOException
    */
-  public HashMap<String, Farm> parseFile(String fileName) {
-    Scanner scnr = new Scanner(fileName);
+  public HashMap<String, Farm> parseFile(FileReader fileName)
+      throws IOException {
+    BufferedReader scnr = new BufferedReader(fileName);
     HashMap<String, Farm> hm = new HashMap<String, Farm>();
-    while (scnr.hasNext()) {
-      String next = scnr.next();
+    String next = scnr.readLine(); // skip the header
+    // set next to the next line and check if it is null
+    while ((next = scnr.readLine()) != null) {
+      // nothing else to get!
+      if (next.equals("")) {
+        break;
+      }
+
       // CSV, split by a comma
       String[] split = next.split(",");
       boolean validDate = false;
 
       // validate the date
       LocalDate date = null;
-      while (!validDate && scnr.hasNext()) {
+      while (!validDate && next != null) {
+        split = next.split(",");
         String currDate = split[0];
+        String[] parseDate = currDate.split("-");
         try {
-          date = LocalDate.parse(currDate);
+          int year = Integer.valueOf(parseDate[0]);
+          int month = Integer.valueOf(parseDate[1]);
+          int day = Integer.valueOf(parseDate[2]);
+          date = LocalDate.of(year, month, day);
           // quit the loop
           validDate = true;
-        } catch (DateTimeException e) {
+        } catch (Exception e) {
           // get the next line
-          next = scnr.next();
-          split = next.split(",");
+          next = scnr.readLine();
         }
       }
 
       // validate the weight
-      //String strWeight = split[2];
-      String strWeight = "15";
+      String strWeight = split[2];
       int weight;
       try {
         weight = Integer.valueOf(strWeight);
@@ -66,11 +78,18 @@ public class CSVFile extends FarmFile {
         weight = 0;
       }
 
-      // will accept any String ID
       String ID = split[1];
-      Farm farm = new Farm(ID);
+      Farm farm;
+      // if the hashmap does not contain this current key
+      if (!hm.containsKey(ID)) {
+        // will accept any String ID
+        farm = new Farm(ID);
+        hm.put(ID, farm);
+      }
+      // else get it from the map
+      farm = hm.get(ID);
       farm.addMilk(weight, date);
-      hm.put(ID, farm);
+
     }
     scnr.close();
     // return the hashmap
