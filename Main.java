@@ -40,6 +40,8 @@ import javafx.stage.Stage;
  *
  */
 public class Main extends Application {
+	// Stores the farm, percent of total weight, and the total weight so it can be
+	// used to make a table
 	private class TableInner {
 		private Farm farmName;
 		private double percent;
@@ -52,46 +54,66 @@ public class Main extends Application {
 		}
 	}
 
+	// The scene with the choices
 	Scene choice;
+
+	// The csv file
 	CSVFile csv = new CSVFile();
+
+	// The file name given by the user
 	String fileName = "";
 
+	// hashMap full of all farms
 	HashMap<String, Farm> hashMap = null;
 
-	// Gets the fifth scene, Data Range Report
+	// The Data Range Report scene
 	Scene fifthScene = null;
-	// Gets the forth scene, Monthly report
+	// The Monthly report scene
 	Scene forthScene = null;
-	// Gets the third scene, Annual Report
+	// The Annual Report scene
 	Scene thirdScene = null;
-	// Gets the second scene, farm report
+	// The farm report scene
 	Scene secondScene = null;
 
+	// Buttons that will be used to change to a specified scene chosen by the user
 	Button farm = new Button("Farm Report");
 	Button month = new Button("Month Report");
 	Button annual = new Button("Annual Report");
 	Button data = new Button("Data Range Report");
 	boolean flag = true;
 
+	// Array list of all farms
 	ArrayList<Farm> allFarms;
 
+	// Combo box of all farms, user chooses which farm they want to look at
 	ComboBox<Farm> farmCombo;
 
+	// Combo box of all months, user chooses which month to look at
 	ComboBox<String> monthCombo;
 
+	// Array list of months
 	ArrayList<String> months;
 
+	// Once the user types 2 dates in the data range report scene, they have to
+	// click this button to show the result
 	Button submitDate = new Button("Submit Date");
 
+	// The first date the user chose
 	LocalDate firstDate;
+
+	// The second date the user chose
 	LocalDate secondDate;
 
+	// Stores the first date picked by the user
 	DatePicker d;
+
+	// Stores the second date picked by the user
 	DatePicker d2;
 
 	@Override
 	public void start(Stage arg0) throws Exception {
 
+		// For the first scene
 		BorderPane root = new BorderPane();
 
 		// Title and welcome sign
@@ -102,25 +124,24 @@ public class Main extends Application {
 		Label lable2 = new Label("Welcome! Start by entering the file name below, click Submit,"
 				+ "then click Continue");
 
-		// Type input and submit
+		// A place for the user to type the file name and submit
 		Button continueButton = new Button("Continue");
 		TextField textField = new TextField();
 		Button button = new Button("Submit");
 
-		// If submit pressed, then go to choiceScene method
+		// If the submit button pressed, then save the file name put in by the user and
+		// go to choiceScene method, where the choice
+		// scene and all other scenes are made
 		button.setOnAction(e -> {
 			fileName = textField.getText();
 			choiceScene(arg0, continueButton);
 		});
 
+		//All this makes the first scene
 		VBox vBoxFirstScene = new VBox();
 		vBoxFirstScene.getChildren().addAll(text, lable2, textField, button, continueButton);
 		vBoxFirstScene.setAlignment(Pos.CENTER);
-
-		// Return first scene
 		root.setCenter(vBoxFirstScene);
-
-		// The first scene
 		Scene mainScene = new Scene(root, 450, 200);
 		arg0.setTitle("Milk Weights");
 		arg0.setScene(mainScene);
@@ -147,13 +168,13 @@ public class Main extends Application {
 		choice = new Scene(vBox, 500, 100);
 
 		continueButton.setOnAction(e -> arg0.setScene(choice));
-		
+
 		hashMap = csv.parseFile(fileName);
 		allFarms = new ArrayList<Farm>();
 		for (int i = 0; i < hashMap.size(); i++) {
 			allFarms.add(hashMap.get(i));
 		}
-		
+
 		// Which button or choice in combo box was pressed
 		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
 		farmCombo.setOnAction(e -> {
@@ -586,7 +607,6 @@ public class Main extends Application {
 		vbox.getChildren().addAll(table);
 		return vbox;
 	}
-
 
 	public PieChart getPieChartWithFarm() {
 		int num = allFarms.size();
