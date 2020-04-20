@@ -8,98 +8,94 @@ import java.util.Map;
 
 /**
  * This class models a monthly report per request from the user, should handle
- * data sorting (and display scene?)
+ * data sorting
  * 
  * @author Alex, Ariel, Catherine, Harry, Prasun
  *
  */
 public class MonthlyReport extends ReportBase {
 
-	private HashMap<String, Farm> farms;
-	private int year;
-	private int month;
-	
-	/**
-	 * Constructor with three parameters
-	 * @param farms - HashMap of all data
-	 * @param year to take month from
-	 * @param month to take data from
-	 */
-	public MonthlyReport(HashMap<String, Farm> farms, Year year, int month) {
-		this.farms = farms;
-		this.year = year.getYear();
-		this.month = month;
-	}
-	
-	/**
-	 * @return list of percents of each farm compared to total amount
-	 */
-	public List<Double> getPercents() {
-		List<Double> percents = new ArrayList<Double>();
-		double milkSum = 0;
-		Farm currFarm = null;
-		Iterator farmIt = farms.entrySet().iterator();
-		while(farmIt.hasNext()) {
-			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
-			milkSum += currFarm.getMonthTotal(month, year);
-			percents.add((double)currFarm.getMonthTotal(month, year));
-		}
-		for(int i = 0; i < percents.size(); i++) {
-			percents.set(i, percents.get(i) / milkSum);
-		}
-		return percents;
-	}
+  private HashMap<String, Farm> farms; // stores the farm for the user-specified
+                                       // month
+  private int year; // user-specified year
+  private int month; // user-specified month
 
-	/**
-	 * @return average of all milk amounts
-	 */
-	public double getAvg() {
-		double milkSum = 0;
-		Farm currFarm = null;
-		Iterator farmIt = farms.entrySet().iterator();
-		while(farmIt.hasNext()) {
-			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
-			milkSum += currFarm.getAvgWeightMonth(month, year);
-		}
-		return milkSum / farms.size();
-	}
+  /**
+   * Constructor with three parameters
+   * 
+   * @param farms - HashMap of all data
+   * @param year  to take month from
+   * @param month to take data from
+   */
+  public MonthlyReport(HashMap<String, Farm> farms, Year year, int month) {
+    this.farms = farms;
+    this.year = year.getYear();
+    this.month = month;
+  }
 
-	/**
-	 * @return minimum of all milk amounts
-	 */
-	public double getMin() {
-		double minMilk = 1000;
-		Farm currFarm = null;
-		Iterator farmIt = farms.entrySet().iterator();
-		while(farmIt.hasNext()) {
-			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
-			if(currFarm.getMonthTotal(month, year) < minMilk) {
-				minMilk = currFarm.getMonthTotal(month, year);
-			}
-		}
-		return minMilk;
-	}
+  /**
+   * @return list of percents of each farm compared to total amount
+   */
+  public List<Double> getPercents() {
+    List<Double> percents = new ArrayList<Double>();
+    double milkSum = 0;
+    Farm currFarm = null;
+    Iterator farmIt = farms.entrySet().iterator();
+    while (farmIt.hasNext()) {
+      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
+      milkSum += currFarm.getMonthTotal(month, year);
+      percents.add((double) currFarm.getMonthTotal(month, year));
+    }
+    for (int i = 0; i < percents.size(); i++) {
+      percents.set(i, percents.get(i) / milkSum);
+    }
+    return percents;
+  }
 
-	/**
-	 * @return maximum of all milk amounts
-	 */
-	public double getMax() {
-		double maxMilk = 0;
-		Farm currFarm = null;
-		Iterator farmIt = farms.entrySet().iterator();
-		while(farmIt.hasNext()) {
-			currFarm = ((Map.Entry<String, Farm>)farmIt.next()).getValue();
-			if(currFarm.getMonthTotal(month, year) > maxMilk) {
-				maxMilk = currFarm.getMonthTotal(month, year);
-			}
-		}
-		return maxMilk;
-	}
+  /**
+   * @return average of all milk amounts
+   */
+  public double getAvg() {
+    double milkSum = 0;
+    Farm currFarm = null;
+    Iterator farmIt = farms.entrySet().iterator();
+    while (farmIt.hasNext()) {
+      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
+      milkSum += currFarm.getAvgWeightMonth(month, year);
+    }
+    return milkSum / farms.size();
+  }
 
-	@Override
-	boolean validateInputs() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /**
+   * @return minimum of all milk amounts
+   */
+  public double getMin() {
+    double minMilk = 1000;
+    Farm currFarm = null;
+    Iterator farmIt = farms.entrySet().iterator();
+    while (farmIt.hasNext()) {
+      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
+      if (currFarm.getMonthTotal(month, year) < minMilk) {
+        minMilk = currFarm.getMonthTotal(month, year);
+      }
+    }
+    return minMilk;
+  }
+
+  /**
+   * @return maximum of all milk amounts
+   */
+  public double getMax() {
+    double maxMilk = 0;
+    Farm currFarm = null;
+    Iterator farmIt = farms.entrySet().iterator();
+    while (farmIt.hasNext()) {
+      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
+      if (currFarm.getMonthTotal(month, year) > maxMilk) {
+        maxMilk = currFarm.getMonthTotal(month, year);
+      }
+    }
+    return maxMilk;
+  }
 
 }
