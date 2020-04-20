@@ -92,10 +92,12 @@ public class Main extends Application {
 	ArrayList<Farm> allFarms = new ArrayList<Farm>();
 
 	// Combo box of all farms, user chooses which farm they want to look at
-	ComboBox<Farm> farmCombo = new ComboBox<Farm>(FXCollections.observableArrayList());
+	ComboBox<String> farmCombo = new ComboBox<String>(FXCollections.observableArrayList());
+	Button farmReportSubmitButton = new Button("Submit and show");
 
 	// Combo box of all months, user chooses which month to look at
 	ComboBox<String> monthCombo = new ComboBox<String>(FXCollections.observableArrayList());
+	Button monthReportSubmitButton = new Button("Submit and show");
 
 	// Array list of months
 	ArrayList<String> months;
@@ -187,40 +189,40 @@ public class Main extends Application {
 		
 		// Which button or choice in combo box was pressed
 		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
-		farmCombo.setOnAction(e -> {
+		farmReportSubmitButton.setOnAction(e -> {
 			for (int i = 0; i < hashMap.size(); i++) {
-				if (farmCombo.getValue() == allFarms.get(i)) {
+				if (farmCombo.getValue() == allFarms.get(i).getID()) {
 					arg0.setScene(
-							this.getSecondSceneOnceAFarmIsChosen(arg0, farmCombo, allFarms.get(i)));
+							this.getSecondSceneOnceAFarmIsChosen(arg0, allFarms.get(i)));
 				}
 			}
 		});
 		month.setOnAction(e -> arg0.setScene(getForthScene(arg0, choice)));
-		monthCombo.setOnAction(e -> {
+		monthReportSubmitButton.setOnAction(e -> {
 			if (getMonthNum(monthCombo.getValue()) == 1) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "January"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "January"));
 			} else if (getMonthNum(monthCombo.getValue()) == 2) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "February"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"February"));
 			} else if (getMonthNum(monthCombo.getValue()) == 3) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "March"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"March"));
 			} else if (getMonthNum(monthCombo.getValue()) == 4) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "April"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "April"));
 			} else if (getMonthNum(monthCombo.getValue()) == 5) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "May"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "May"));
 			} else if (getMonthNum(monthCombo.getValue()) == 6) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "June"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"June"));
 			} else if (getMonthNum(monthCombo.getValue()) == 7) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "July"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "July"));
 			} else if (getMonthNum(monthCombo.getValue()) == 8) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "August"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "August"));
 			} else if (getMonthNum(monthCombo.getValue()) == 9) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "September"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "September"));
 			} else if (getMonthNum(monthCombo.getValue()) == 10) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "October"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "October"));
 			} else if (getMonthNum(monthCombo.getValue()) == 11) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "November"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "November"));
 			} else {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, monthCombo, "December"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "December"));
 			}
 		});
 		annual.setOnAction(e -> arg0.setScene(getThirdScene(arg0, choice)));
@@ -240,10 +242,14 @@ public class Main extends Application {
 	public Scene getSecondScene(Stage arg0) {
 		// SECOND SCENE
 
+		ArrayList<String> id = new ArrayList<String>();
+		for(int i = 0; i < allFarms.size(); i++) {
+			id.add(allFarms.get(i).getID());
+		}
 		// ComboBox
-		farmCombo = new ComboBox<Farm>();
+		farmCombo = new ComboBox<String>();
 		for (int i = 0; i < hashMap.size(); i++) {
-			farmCombo = new ComboBox<Farm>(FXCollections.observableArrayList(allFarms));
+			farmCombo = new ComboBox<String>(FXCollections.observableArrayList(id));
 		}
 
 		Text secondText = new Text();
@@ -260,14 +266,14 @@ public class Main extends Application {
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
-		secondVBox.getChildren().addAll(secondText, hBoxAll, goBack(arg0));
+		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, goBack(arg0));
 
 		// Return second scene
 		secondScene = new Scene(secondVBox, 1000, 1500);
 		return secondScene;
 	}
 
-	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, ComboBox<Farm> farmCombo,
+	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0,
 			Farm chosenFarm) {
 		// Pie Chart
 		PieChart chart = this.getPieChartWithMonth(chosenFarm);
@@ -291,7 +297,7 @@ public class Main extends Application {
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
-		secondVBox.getChildren().addAll(secondText, hBoxAll, charts, goBack(arg0));
+		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, charts, goBack(arg0));
 
 		// Return second scene
 		secondScene = new Scene(secondVBox, 1000, 1500);
@@ -373,21 +379,19 @@ public class Main extends Application {
 
 		// Makes the forthScene
 		VBox forthBox = new VBox();
-		forthBox.getChildren().addAll(forthText, monthCombo, goBack(arg0));
+		forthBox.getChildren().addAll(forthText, monthCombo, monthReportSubmitButton,  goBack(arg0));
 
 		// Return second scene
 		forthScene = new Scene(forthBox, 1000, 1000);
 		return forthScene;
 	}
 
-	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0, ComboBox<String> monthCombo,
+	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0,
 			String month) {
 		// ComboBox
-		Label farm = new Label("Month     ");
-		ComboBox<String> farmCombo = new ComboBox<String>(
-				FXCollections.observableArrayList("Farm1", "Farm2", "Farm3"));
-		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(farm, farmCombo);
+		Label monthLabel = new Label("Month     ");
+		HBox hBox = new HBox();
+		hBox.getChildren().addAll(monthLabel, monthCombo);
 
 		PieChart pieChart2 = getPieChartWithFarmForMonths(month);
 		pieChart2.setTitle("Monthly Percentage");
@@ -405,7 +409,7 @@ public class Main extends Application {
 
 		// Makes the forthScene
 		VBox forthBox = new VBox();
-		forthBox.getChildren().addAll(forthText, monthCombo, charts, tableSpace, goBack(arg0));
+		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton,  charts, tableSpace, goBack(arg0));
 
 		// Return second scene
 		forthScene = new Scene(forthBox, 1000, 1000);
@@ -568,18 +572,23 @@ public class Main extends Application {
 
 	public PieChart getPieChartWithFarmForMonths(String month) {
 		int num = allFarms.size();
-		PieChart.Data pieChart = null;
-		ArrayList<PieChart.Data> listOfData = new ArrayList<PieChart.Data>();
-		Double percentTotle = 0.0;
+		ArrayList<String> listOfData = new ArrayList<String>();
+		ArrayList<Double> listOfData2 = new ArrayList<Double>();
 		int chosenMonth = getMonthNum(month);
+		ArrayList<PieChart.Data> finalArray = new ArrayList<PieChart.Data>();
 		for (int i = 0; i < num; i++) {
 			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			pieChart = new PieChart.Data("Farm " + allFarms.get(i).getID(),
-					farmReport.getPercents().get(chosenMonth));
-			listOfData.add(pieChart);
-			percentTotle = 0.0;
+			listOfData.add(allFarms.get(i).getID());
+			listOfData2.add(farmReport.getPercents().get(chosenMonth));
 		}
-		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(listOfData);
+		System.out.println(listOfData);
+		System.out.println(listOfData2);
+		System.out.println(chosenMonth);
+		for(int i = 0; i < num; i++) {
+			PieChart.Data pieChart = new PieChart.Data(listOfData.get(i), listOfData2.get(i));
+			finalArray.add(pieChart);
+		}
+		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(finalArray);
 		PieChart chart = new PieChart(pieChartData);
 		return chart;
 	}
