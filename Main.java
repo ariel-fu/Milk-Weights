@@ -1,9 +1,15 @@
 package application;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -83,13 +89,13 @@ public class Main extends Application {
 	boolean flag = true;
 
 	// Array list of all farms
-	ArrayList<Farm> allFarms;
+	ArrayList<Farm> allFarms = new ArrayList<Farm>();
 
 	// Combo box of all farms, user chooses which farm they want to look at
-	ComboBox<Farm> farmCombo;
+	ComboBox<Farm> farmCombo = new ComboBox<Farm>(FXCollections.observableArrayList());
 
 	// Combo box of all months, user chooses which month to look at
-	ComboBox<String> monthCombo;
+	ComboBox<String> monthCombo = new ComboBox<String>(FXCollections.observableArrayList());
 
 	// Array list of months
 	ArrayList<String> months;
@@ -134,7 +140,12 @@ public class Main extends Application {
 		// scene and all other scenes are made
 		button.setOnAction(e -> {
 			fileName = textField.getText();
-			choiceScene(arg0, continueButton);
+			try {
+				choiceScene(arg0, continueButton);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		});
 
 		//All this makes the first scene
@@ -155,9 +166,10 @@ public class Main extends Application {
 	 * @param arg0        - the arg
 	 * @param secondScene - the second scene
 	 * @return the first scene, input file name
+	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	public void choiceScene(Stage arg0, Button continueButton) {
+	public void choiceScene(Stage arg0, Button continueButton) throws IOException {
 
 		// Choices scene
 		HBox hBox = new HBox();
@@ -169,12 +181,10 @@ public class Main extends Application {
 
 		continueButton.setOnAction(e -> arg0.setScene(choice));
 
-		hashMap = csv.parseFile(fileName);
-		allFarms = new ArrayList<Farm>();
-		for (int i = 0; i < hashMap.size(); i++) {
-			allFarms.add(hashMap.get(i));
-		}
-
+		hashMap = csv.parseFile(new FileReader(fileName));
+		Collection<Farm> collection = hashMap.values();
+		allFarms =  new ArrayList<Farm>(collection);
+		
 		// Which button or choice in combo box was pressed
 		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
 		farmCombo.setOnAction(e -> {
@@ -243,12 +253,10 @@ public class Main extends Application {
 
 		Label farm = new Label("Farm     ");
 
-		Label year = new Label("          Year     ");
-		ComboBox<String> yearCombo = new ComboBox<String>(
-				FXCollections.observableArrayList("Year"));// CHANGE MAYBE
+		Label year = new Label("     Year: 2019");// CHANGE MAYBE
 //		Button reload = new Button("Reload"); I DON'T THINK THIS IS NEEDED, CAUSE IT RESETS EVERYTIME COMBOBOX IS CHANGED.
 		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo);
+		hBoxAll.getChildren().addAll(farm, farmCombo, year);
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
@@ -274,15 +282,12 @@ public class Main extends Application {
 
 		Label farm = new Label("Farm     ");
 
-		Label year = new Label("          Year     ");
-		ComboBox<String> yearCombo = new ComboBox<String>(
-				FXCollections.observableArrayList(String.valueOf("2019")));// CHANGE MAYBE
+		Label year = new Label("     Year: 2019");// CHANGE MAYBE
 		Label space = new Label("          ");
-		Button reload = new Button("Reload");
 		HBox hBoxSpace = new HBox();
-		hBoxSpace.getChildren().addAll(space, reload);
+		hBoxSpace.getChildren().addAll(space);
 		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(farm, farmCombo, year, yearCombo, hBoxSpace);
+		hBoxAll.getChildren().addAll(farm, farmCombo, year, hBoxSpace);
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
@@ -435,7 +440,8 @@ public class Main extends Application {
 		hBoxAll.getChildren().addAll(r);
 		hBoxAll2.getChildren().addAll(r2);
 		Label space = new Label("     ");
-		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space, submitDate);
+		Label space2 = new Label("     ");
+		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2, submitDate);
 
 		// Go back to choices
 		VBox fifthBox = new VBox();
@@ -466,7 +472,8 @@ public class Main extends Application {
 		hBoxAll.getChildren().addAll(r);
 		hBoxAll2.getChildren().addAll(r2);
 		Label space = new Label("     ");
-		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space, submitDate);
+		Label space2 = new Label("     ");
+		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2, submitDate);
 
 		// Go back to choices
 		VBox fifthBox = new VBox();
@@ -618,7 +625,7 @@ public class Main extends Application {
 			for (int j = 0; j < farmReport.getPercents().size(); j++) {
 				percentTotle += farmReport.getPercents().get(j);
 			}
-			pieChart = new PieChart.Data("Farm " + allFarms.get(i).getID(), percentTotle);
+			pieChart = new PieChart.Data(allFarms.get(i).getID(), percentTotle);
 			listOfData.add(pieChart);
 			percentTotle = 0.0;
 		}
