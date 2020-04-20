@@ -13,8 +13,8 @@ import java.time.LocalDate;
 public class Year {
 
   private int year; // represents what year it is
-  // TODO: change to private
-  protected Milk[] milks; // holds the milks for one year
+  
+  private Milk[] milks; // holds the milks for one year
 
   /**
    * Constructor that sets up the Year

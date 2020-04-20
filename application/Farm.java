@@ -14,8 +14,7 @@ import java.util.List;
  */
 public class Farm {
   private String ID;
-  // TODO: change back to private after testing
-  protected List<Year> years;
+  private List<Year> years;
 
   /**
    * Inits the List of milk and set the ID to the input
@@ -272,8 +271,9 @@ public class Farm {
   }
 
   /**
-   * Returns a list of years from this Farm
-   * @return a list of years from this Farm
+   * Getter method for the years for this farm
+   * 
+   * @return list of years
    */
   public List<Year> getListOfYears() {
     return this.years;
