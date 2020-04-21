@@ -657,7 +657,7 @@ public class Main extends Application {
 		for (int i = 0; i < allFarms.size(); i++) {
 			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
 			String percentDouble = Double
-					.toString(monthly.getPercents().get(getMonthNum(chosenMonth)));
+					.toString(monthly.getPercents().get(i));
 			String weightInt = Double
 					.toString(allFarms.get(i).getMonthTotal(getMonthNum(chosenMonth), 2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
