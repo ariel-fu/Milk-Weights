@@ -1,227 +1,86 @@
 package application;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * This class holds one year worth of milk. Note, this HashMap does not insert
- * in a sorted order. Since it uses the String date to map each Milk object, it
- * is a O(1) look-up :)
+ * This class models a report about a specific farm and year, both are given by
+ * the user
  * 
  * @author Alex, Ariel, Catherine, Harry, Prasun
  *
  */
-public class Year {
-
-  private int year; // represents what year it is
-  
-  private Milk[] milks; // holds the milks for one year
+public class FarmReport extends ReportBase {
+  private Farm farm; // user-specified farm
+  private int year; // user-specified year
 
   /**
-   * Constructor that sets up the Year
+   * Constructor that sets the farm and the year to the user-specified values
    * 
-   * @param year - represent the year
+   * @param farm the farm the user wants to see
+   * @param year specific year of the farm
    */
-  public Year(int year) {
+  public FarmReport(Farm farm, int year) {
+    this.farm = farm;
     this.year = year;
-    // set initial capacity to 366 because of stupid leap years
-    milks = new Milk[366];
-    for (int i = 0; i < milks.length; i++) {
-      milks[i] = new Milk();
-    }
   }
 
   /**
-   * Returns which year this is
+   * This method calculate how much percent does each month contributes towards
+   * the entire year
    * 
-   * @return the year
+   * @return an arrayList of percentages of each month
    */
-  public int getYear() {
-    return this.year;
-  }
-
-  /**
-   * Adds a milk to the year
-   * 
-   * @param milk - new milk to add to the year
-   */
-  public void addMilk(int weight, LocalDate date) {
-    milks[date.getDayOfYear()] = new Milk(weight);
-  }
-
-  /**
-   * Gets the milk given the date
-   * 
-   * @param milkDate - date of the milk
-   * @return Milk object given the date
-   */
-  public Milk getMilk(LocalDate date) {
-    return milks[date.getDayOfYear()];
-  }
-
-  /**
-   * Gets the weight of a year worth of milk
-   * 
-   * @return the whole year's milk weight
-   */
-  public int getYearTotal() {
-    int yearTotal = 0;
-    // get the year as an int
-
-    for (int i = 0; i < milks.length; i++) {
-      yearTotal += milks[i].getWeight();
+  @Override
+  List<Double> getPercents() {
+    ArrayList<Double> list = new ArrayList<Double>();
+    int month = 0;
+    for (int x = 1; x < 13; x++) {
+      month = farm.getMonthTotal(x, year);
+      list.add(((double) month) / farm.getYearTotal(year));
     }
 
-    return yearTotal;
+    return list;
   }
 
   /**
-   * Gets the total milk weight for a given weight
+   * This method gets the overall average milk weight for the whole year
    * 
-   * @param month - user given month
-   * @return total milk weight
+   * @return the average weight of milk for the whole year
    */
-  public int getMonthTotal(int month) {
-    int monthTotal = 0;
-
-    LocalDate firstDate = LocalDate.of(this.year, month, 1);
-    int max = firstDate.lengthOfMonth();
-    int firstDay = firstDate.getDayOfYear();
-    // add all the days in the month
-    for (int i = 0; i < max; i++) {
-      // get the days in the month
-      monthTotal += milks[firstDay + i].getWeight();
-    }
-    // return total
-    return monthTotal;
+  @Override
+  double getAvg() {
+    return (farm.getYearTotal(year) / 12.0);
   }
 
   /**
-   * Gets the total milk weight between the two date ranges
-   * 
-   * @param day1 - starting date
-   * @param day2 - last date
-   * @return the total milk weight between the two date ranges
+   * This method returns the month with the lowest yield of milk
    */
-  public int getRange(LocalDate day1, LocalDate day2) {
-
-    int totalWeight = 0;
-
-    // while the curr date is not the last date, add up the weights
-    for (int i = day1.getDayOfYear(); i < day2.getDayOfYear() + 1; i++) {
-      totalWeight += milks[i].getWeight();
-    }
-    return totalWeight;
-  }
-
-  /**
-   * Gets the max weight from this year
-   * 
-   * @return max weight, or 0 if the year is empty
-   */
-  public int getMaxWeightYear() {
-    int max = 0;
-    for (int i = 0; i < milks.length; i++) {
-      int currWeight = milks[i].getWeight();
-      if (currWeight > max) {
-        max = currWeight;
-      }
-    }
-    return max;
-  }
-
-  /**
-   * Gets the min weight from this year
-   * 
-   * @return the min weight
-   */
-  public int getMinWeightYear() {
-    int min = 1000000;
-    for (int i = 0; i < milks.length; i++) {
-      int currWeight = milks[i].getWeight();
-      if (currWeight < min) {
-        min = currWeight;
-      }
+  @Override
+  double getMin() {
+    double min = farm.getMonthTotal(1, year);
+    for (int x = 2; x < 13; x++) {
+      double month = farm.getMonthTotal(x, year);
+      if (month < min)
+        min = month;
     }
     return min;
   }
 
   /**
-   * Gets the average for the year
+   * This method returns the month with the most yield of milk
    * 
-   * @return the average as a double
-   */
-  public double getAvgWeightYear() {
-    double avg = 0;
-    for (int i = 0; i < milks.length; i++) {
-      int currWeight = milks[i].getWeight();
-      avg += currWeight;
+   * @return the month that had the most yield of milk
+   **/
+  @Override
+  double getMax() {
+    double max = farm.getMonthTotal(1, year);
+    for (int x = 2; x < 13; x++) {
+      double month = farm.getMonthTotal(x, year);
+      if (month > max)
+        max = month;
     }
-    return avg / milks.length;
-  }
-
-  /**
-   * Gets the min weight of a month
-   * 
-   * @param month - specified month
-   * @return the min weight of a specified month
-   */
-  public int getMinWeightMonth(int month) {
-    int minMonthWeight = 1000000;
-
-    LocalDate firstDate = LocalDate.of(this.year, month, 1);
-    int max = firstDate.lengthOfMonth();
-    int firstDay = firstDate.getDayOfYear();
-
-    // add all the days in the month
-    for (int i = 0; i < max + 1; i++) {
-      int currWeight = milks[firstDay + i].getWeight();
-      // if the current weight is less than the curr min, that will be the new
-      // min
-      if (currWeight < minMonthWeight) {
-        minMonthWeight = currWeight;
-      }
-    }
-    // return total
-    return minMonthWeight;
-  }
-
-  /**
-   * Get the max weight of a month
-   * 
-   * @param month - month to get the max weight
-   * @return gets the max weight of a month
-   */
-  public int getMaxWeightMonth(int month) {
-    int maxMonthWeight = 0;
-
-    LocalDate firstDate = LocalDate.of(this.year, month, 1);
-    int max = firstDate.lengthOfMonth();
-    int firstDay = firstDate.getDayOfYear();
-
-    for (int i = 0; i < max + 1; i++) {
-      int currWeight = milks[firstDay + i].getWeight();
-      // if the current is greater than the previous max, set the new max to the
-      // current weight
-      if (currWeight > maxMonthWeight) {
-        maxMonthWeight = currWeight;
-      }
-    }
-    // return total
-    return maxMonthWeight;
-  }
-
-  public double getAvgWeightMonth(int month) {
-    double avg = 0;
-
-    LocalDate firstDate = LocalDate.of(this.year, month, 1);
-    int max = firstDate.lengthOfMonth();
-    int firstDay = firstDate.getDayOfYear();
-    // add all the days in the month
-    for (int i = 0; i < max + 1; i++) {
-      int currWeight = milks[firstDay + i].getWeight();
-      avg += currWeight;
-    }
-    return avg / milks.length;
+    return max;
   }
 
 }
