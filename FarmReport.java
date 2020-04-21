@@ -33,11 +33,11 @@ public class FarmReport extends ReportBase {
    */
   @Override
   List<Double> getPercents() {
-    ArrayList<Double> list = new ArrayList<Double>();
+    List<Double> list = new ArrayList<Double>();
     int month = 0;
     for (int x = 1; x < 13; x++) {
       month = farm.getMonthTotal(x, year);
-      list.add(((double) month) / farm.getYearTotal(year));
+      list.add((double)((month) / farm.getYearTotal(year)));
     }
 
     return list;
@@ -82,5 +82,11 @@ public class FarmReport extends ReportBase {
     }
     return max;
   }
+
+@Override
+boolean validateInputs() {
+	// TODO Auto-generated method stub
+	return false;
+}
 
 }

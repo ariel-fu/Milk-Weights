@@ -98,4 +98,10 @@ public class MonthlyReport extends ReportBase {
     return maxMilk;
   }
 
+@Override
+boolean validateInputs() {
+	// TODO Auto-generated method stub
+	return false;
+}
+
 }

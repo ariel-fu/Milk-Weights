@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -50,40 +51,40 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	// Stores the farm, percent of total weight, and the total weight so it can be
 	// used to make a table
-	private class TableInner {
-		private String farmName;
-		private String percent;
-		private String weight;
+	public class TableInner {
+		private final SimpleStringProperty name;
+		private final SimpleStringProperty percent;
+		private final SimpleStringProperty weight;
 
 		public TableInner(String farmName, String percent, String weight) {
-			this.farmName = farmName;
-			this.percent = percent;
-			this.weight = weight;
+			this.name = new SimpleStringProperty(farmName);
+			this.percent = new SimpleStringProperty(percent);
+			this.weight = new SimpleStringProperty(weight);
 		}
 
-		public String getFarmName() {
-			return farmName;
+		public String getName() {
+			return name.get();
+		}
+
+		public void setName(String name) {
+			this.name.set(name);
 		}
 
 		public String getPercent() {
-			return percent;
+			return percent.get();
+		}
+
+		public void setPercent(String percent) {
+			this.percent.set(percent);
 		}
 
 		public String getWeight() {
-			return weight;
+			return weight.get();
 		}
-		
-		public String farmNameProperty() {
-	        return farmName;
-	    }
-		
-		public String percentProperty() {
-	        return percent;
-	    }
-		
-		public String weightProperty() {
-	        return weight;
-	    }
+
+		public void setDataSensorTwo(String weight) {
+			this.weight.set(weight);
+		}
 	}
 
 	// The scene with the choices
@@ -115,7 +116,7 @@ public class Main extends Application {
 	boolean flag = true;
 
 	// Array list of all farms
-	ArrayList<Farm> allFarms = new ArrayList<Farm>();
+	private ArrayList<Farm> allFarms = new ArrayList<Farm>();
 
 	// Combo box of all farms, user chooses which farm they want to look at
 	ComboBox<String> farmCombo = new ComboBox<String>(FXCollections.observableArrayList());
@@ -198,7 +199,6 @@ public class Main extends Application {
 	 * @throws InterruptedException
 	 */
 	public void choiceScene(Stage arg0, Button continueButton) throws IOException {
-
 		// Choices scene
 		HBox hBox = new HBox();
 		hBox.getChildren().addAll(farm, month, annual, data);
@@ -257,6 +257,19 @@ public class Main extends Application {
 		close.setOnAction(e -> arg0.close());
 	}
 
+	public Scene fileNotFoundScene(Stage arg0) {
+		Text secondText = new Text();
+		secondText.setText("File: " + fileName
+				+ " not found. Please go back and change your stupid file name!");
+		secondText.setFill(Color.BLACK);
+		secondText.setStyle("-fx-font: 30 arial;");
+		HBox hBox = new HBox();
+		hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
+		hBox.setAlignment(Pos.CENTER);
+		Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
+		return fileNotFoundScene;
+	}
+
 	/**
 	 * Returns the second scene, farm report.
 	 * 
@@ -285,7 +298,6 @@ public class Main extends Application {
 		Label farm = new Label("Farm     ");
 
 		Label year = new Label("     Year: 2019");// CHANGE MAYBE
-//		Button reload = new Button("Reload"); I DON'T THINK THIS IS NEEDED, CAUSE IT RESETS EVERYTIME COMBOBOX IS CHANGED.
 		HBox hBoxAll = new HBox();
 		hBoxAll.getChildren().addAll(farm, farmCombo, year);
 
@@ -344,13 +356,12 @@ public class Main extends Application {
 		thirdText.setStyle("-fx-font: 20 arial;");
 
 		// ComboBox
-		Label year = new Label("          Year     ");
-		ComboBox<String> yearCombo = new ComboBox<String>(
-				FXCollections.observableArrayList("2019"));// MAYBE CHANGE YEAR
+		Label year = new Label("          Year:    ");
+		Label year2019 = new Label("2019");// MAYBE CHANGE YEAR
 		// Button reload = new Button("Reload"); PORBABLY DON'T NEED THIS
 		HBox hBoxSpace = new HBox();
 		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(year, yearCombo, hBoxSpace);
+		hBoxAll.getChildren().addAll(year, year2019, hBoxSpace);
 
 		PieChart chart = getPieChartWithFarm();
 		chart.setTitle("Month Percentage");
@@ -421,10 +432,9 @@ public class Main extends Application {
 		pieChart2.setTitle("Monthly Percentage");
 		HBox charts = new HBox();
 		charts.getChildren().addAll(getBarChartForMonthReport(month), pieChart2);
-		Label spacing = new Label(
-				"                                                                      ");
+		Label spacing = new Label("                                                 ");
 		HBox tableSpace = new HBox();
-		tableSpace.getChildren().addAll(getTableForthScene(), spacing);
+		tableSpace.getChildren().addAll(getTableForthScene(month), spacing);
 
 		Text forthText = new Text();
 		forthText.setText("Monthly Report");
@@ -518,35 +528,39 @@ public class Main extends Application {
 
 	public VBox getTableForFifthScene(LocalDate date1, LocalDate date2) {
 		// Table for farm, percentage, and weight
-		TableView<String> table = new TableView<String>();
-		TableColumn<String, String> farmTable = new TableColumn<String, String>("Farm");
-		TableColumn<String, String> percent = new TableColumn<String, String>("Total percentage");
-		TableColumn<String, String> totle = new TableColumn<String, String>("Total Weight");
-		FarmReport farmReport;
-		Double percentTotle = 0.0;
-		int startDate = date1.getMonthValue();
-		int endDate = date2.getMonthValue();
-		ObservableList data = FXCollections.observableArrayList();
-		for (int i = 0; i < allFarms.size(); i++) {
-			farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = startDate; j < endDate; j++) {
-				percentTotle += farmReport.getPercents().get(j);
-			}
-//			TableInner tableInner = new TableInner(allFarms.get(i).getID(), percentTotle,
-//					allFarms.get(i).getRangeTotal(date1, date2));
-//			data.add(tableInner);
-			percentTotle = 0.0;
-		}
-		farmTable.setMinWidth(100);
-		percent.setMinWidth(100);
-		totle.setMinWidth(100);
+		final TableView<TableInner> table = new TableView<>();
+		table.setItems(getListForTableFifthScene(date1, date2));
+		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
+		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
+		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
+		farmTable.setCellValueFactory(new PropertyValueFactory<TableInner, String>("name"));
+		percent.setCellValueFactory(new PropertyValueFactory<TableInner, String>("percent"));
+		totle.setCellValueFactory(new PropertyValueFactory<TableInner, String>("weight"));
 		table.getColumns().addAll(farmTable, percent, totle);
-		table.setItems(data);
+		farmTable.setMinWidth(200);
+		percent.setMinWidth(200);
+		totle.setMinWidth(200);
 		VBox vbox = new VBox();
-		vbox.setSpacing(5);
-		vbox.setPadding(new Insets(10, 0, 0, 10));
 		vbox.getChildren().addAll(table);
 		return vbox;
+	}
+
+	private ObservableList<TableInner> getListForTableFifthScene(LocalDate date1, LocalDate date2) {
+		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
+		int startDate = date1.getMonthValue();
+		int endDate = date2.getMonthValue();
+		for (int i = 0; i < allFarms.size(); i++) {
+			double percentForYear = 0.0;
+			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			for (int j = startDate; j < endDate; j++) {
+				percentForYear += farmReport.getPercents().get(j);
+			}
+
+			String percentDouble = Double.toString(percentForYear);
+			String weightInt = Double.toString(allFarms.get(i).getRangeTotal(date1, date2));
+			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
+		}
+		return tableInner;
 	}
 
 	public BarChart getBarChartForMonthReport(String month) {
@@ -563,8 +577,8 @@ public class Main extends Application {
 
 		// Making the bar chart from info from Monthly Report
 		dataSeries1.getData().add(new XYChart.Data("Min", monthlyReport.getMin()));
-		dataSeries1.getData().add(new XYChart.Data("Average", monthlyReport.getMax()));
-		dataSeries1.getData().add(new XYChart.Data("Max", monthlyReport.getAvg()));
+		dataSeries1.getData().add(new XYChart.Data("Average", monthlyReport.getAvg()));
+		dataSeries1.getData().add(new XYChart.Data("Max", monthlyReport.getMax()));
 		barChart.getData().add(dataSeries1);
 		return barChart;
 	}
@@ -606,7 +620,7 @@ public class Main extends Application {
 		for (int i = 0; i < num; i++) {
 			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
 			listOfData.add(allFarms.get(i).getID());
-			listOfData2.add(farmReport.getPercents().get(i));
+			listOfData2.add(farmReport.getPercents().get(chosenMonth - 1));
 		}
 		for (int i = 0; i < num; i++) {
 			PieChart.Data pieChart = new PieChart.Data(listOfData.get(i), listOfData2.get(i));
@@ -617,30 +631,41 @@ public class Main extends Application {
 		return chart;
 	}
 
-	public VBox getTableForthScene() {
+	public VBox getTableForthScene(String chosenMonth) {
 		// Table for farm, percentage, and weight
+		final TableView<TableInner> table = new TableView<>();
+		table.setItems(getListForTableForthScene(chosenMonth));
 		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
 		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
 		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
-		farmTable.setMinWidth(100);
-		percent.setMinWidth(100);
-		totle.setMinWidth(100);
-		ObservableList<TableInner> data = FXCollections.observableArrayList();
-		for (int i = 0; i < allFarms.size(); i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			String percentDouble = Double.toString(farmReport.getPercents().get(i));
-			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
-			data.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
-		}
-		farmTable.setCellValueFactory(new PropertyValueFactory<>("farmName"));
-		percent.setCellValueFactory(new PropertyValueFactory<>("percent"));
-		totle.setCellValueFactory(new PropertyValueFactory<>("weight"));
-		TableView<TableInner> table = new TableView<>();
-		table.setItems(data);
+		farmTable.setCellValueFactory(new PropertyValueFactory<TableInner, String>("name"));
+		percent.setCellValueFactory(new PropertyValueFactory<TableInner, String>("percent"));
+		totle.setCellValueFactory(new PropertyValueFactory<TableInner, String>("weight"));
 		table.getColumns().addAll(farmTable, percent, totle);
+		farmTable.setMinWidth(200);
+		percent.setMinWidth(200);
+		totle.setMinWidth(200);
 		VBox vbox = new VBox();
 		vbox.getChildren().addAll(table);
 		return vbox;
+	}
+
+	private ObservableList<TableInner> getListForTableForthScene(String chosenMonth) {
+		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
+		MonthlyReport monthly = new MonthlyReport(hashMap, new Year(2019),
+				getMonthNum(chosenMonth));
+		for (int i = 0; i < allFarms.size(); i++) {
+			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			String percentDouble = Double
+					.toString(monthly.getPercents().get(getMonthNum(chosenMonth)));
+			String weightInt = Double
+					.toString(allFarms.get(i).getMonthTotal(getMonthNum(chosenMonth), 2019));
+			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
+			System.out.println(allFarms.get(i).getID());
+			System.out.println(percentDouble);
+			System.out.println(weightInt);
+		}
+		return tableInner;
 	}
 
 	public PieChart getPieChartWithFarm() {
@@ -664,33 +689,36 @@ public class Main extends Application {
 
 	public VBox getTable() {
 		// Table for farm, percentage, and weight
-		TableView<String> table = new TableView<String>();
-		TableColumn<String, String> farmTable = new TableColumn<String, String>("Farm");
-		TableColumn<String, String> percent = new TableColumn<String, String>("Total percentage");
-		TableColumn<String, String> totle = new TableColumn<String, String>("Total Weight");
-		FarmReport farmReport;
-		Double percentTotle = 0.0;
-		ObservableList data = FXCollections.observableArrayList();
-		for (int i = 0; i < allFarms.size(); i++) {
-			farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentTotle += farmReport.getPercents().get(j);
-			}
-//			TableInner tableInner = new TableInner(allFarms.get(i).getID(), percentTotle,
-//					allFarms.get(i).getYearTotal(2019));
-//			data.add(tableInner);
-			percentTotle = 0.0;
-		}
-		farmTable.setMinWidth(100);
-		percent.setMinWidth(100);
-		totle.setMinWidth(100);
+		final TableView<TableInner> table = new TableView<>();
+		table.setItems(getListForTable());
+		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
+		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
+		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
+		farmTable.setCellValueFactory(new PropertyValueFactory<TableInner, String>("name"));
+		percent.setCellValueFactory(new PropertyValueFactory<TableInner, String>("percent"));
+		totle.setCellValueFactory(new PropertyValueFactory<TableInner, String>("weight"));
 		table.getColumns().addAll(farmTable, percent, totle);
-		table.setItems(data);
+		farmTable.setMinWidth(200);
+		percent.setMinWidth(200);
+		totle.setMinWidth(200);
 		VBox vbox = new VBox();
-		vbox.setSpacing(5);
-		vbox.setPadding(new Insets(10, 0, 0, 10));
 		vbox.getChildren().addAll(table);
 		return vbox;
+	}
+
+	private ObservableList<TableInner> getListForTable() {
+		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
+		for (int i = 0; i < allFarms.size(); i++) {
+			double percentForYear = 0.0;
+			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			for (int j = 0; j < farmReport.getPercents().size(); j++) {
+				percentForYear += farmReport.getPercents().get(j);
+			}
+			String percentDouble = Double.toString(percentForYear);
+			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
+			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
+		}
+		return tableInner;
 	}
 
 	public BarChart getBarChart(Farm chosenFarm) {
