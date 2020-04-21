@@ -37,7 +37,7 @@ public class FarmReport extends ReportBase {
     int month = 0;
     for (int x = 1; x < 13; x++) {
       month = farm.getMonthTotal(x, year);
-      list.add(((double) month / farm.getYearTotal(year)));
+      list.add(((double) month) / farm.getYearTotal(year));
     }
 
     return list;
