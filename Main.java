@@ -49,14 +49,26 @@ public class Main extends Application {
 	// Stores the farm, percent of total weight, and the total weight so it can be
 	// used to make a table
 	private class TableInner {
-		private Farm farmName;
+		private String farmName;
 		private double percent;
 		private int weight;
 
-		public TableInner(Farm farmName, double percent, int weight) {
+		public TableInner(String farmName, double percent, int weight) {
 			this.farmName = farmName;
 			this.percent = percent;
 			this.weight = weight;
+		}
+		
+		public String getFarm() {
+			return farmName;
+		}
+		
+		public double getPercent() {
+			return percent;
+		}
+		
+		public int getWeight() {
+			return weight;
 		}
 	}
 
@@ -150,7 +162,7 @@ public class Main extends Application {
 			}
 		});
 
-		//All this makes the first scene
+		// All this makes the first scene
 		VBox vBoxFirstScene = new VBox();
 		vBoxFirstScene.getChildren().addAll(text, lable2, textField, button, continueButton);
 		vBoxFirstScene.setAlignment(Pos.CENTER);
@@ -168,7 +180,7 @@ public class Main extends Application {
 	 * @param arg0        - the arg
 	 * @param secondScene - the second scene
 	 * @return the first scene, input file name
-	 * @throws IOException 
+	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	public void choiceScene(Stage arg0, Button continueButton) throws IOException {
@@ -185,15 +197,14 @@ public class Main extends Application {
 
 		hashMap = csv.parseFile(new FileReader(fileName));
 		Collection<Farm> collection = hashMap.values();
-		allFarms =  new ArrayList<Farm>(collection);
-		
+		allFarms = new ArrayList<Farm>(collection);
+
 		// Which button or choice in combo box was pressed
 		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
 		farmReportSubmitButton.setOnAction(e -> {
 			for (int i = 0; i < hashMap.size(); i++) {
 				if (farmCombo.getValue() == allFarms.get(i).getID()) {
-					arg0.setScene(
-							this.getSecondSceneOnceAFarmIsChosen(arg0, allFarms.get(i)));
+					arg0.setScene(this.getSecondSceneOnceAFarmIsChosen(arg0, allFarms.get(i)));
 				}
 			}
 		});
@@ -202,25 +213,25 @@ public class Main extends Application {
 			if (getMonthNum(monthCombo.getValue()) == 1) {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "January"));
 			} else if (getMonthNum(monthCombo.getValue()) == 2) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"February"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "February"));
 			} else if (getMonthNum(monthCombo.getValue()) == 3) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"March"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "March"));
 			} else if (getMonthNum(monthCombo.getValue()) == 4) {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "April"));
 			} else if (getMonthNum(monthCombo.getValue()) == 5) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "May"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "May"));
 			} else if (getMonthNum(monthCombo.getValue()) == 6) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,"June"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "June"));
 			} else if (getMonthNum(monthCombo.getValue()) == 7) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "July"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "July"));
 			} else if (getMonthNum(monthCombo.getValue()) == 8) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "August"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "August"));
 			} else if (getMonthNum(monthCombo.getValue()) == 9) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "September"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "September"));
 			} else if (getMonthNum(monthCombo.getValue()) == 10) {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "October"));
 			} else if (getMonthNum(monthCombo.getValue()) == 11) {
-				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0,  "November"));
+				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "November"));
 			} else {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "December"));
 			}
@@ -243,7 +254,7 @@ public class Main extends Application {
 		// SECOND SCENE
 
 		ArrayList<String> id = new ArrayList<String>();
-		for(int i = 0; i < allFarms.size(); i++) {
+		for (int i = 0; i < allFarms.size(); i++) {
 			id.add(allFarms.get(i).getID());
 		}
 		// ComboBox
@@ -273,8 +284,7 @@ public class Main extends Application {
 		return secondScene;
 	}
 
-	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0,
-			Farm chosenFarm) {
+	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, Farm chosenFarm) {
 		// Pie Chart
 		PieChart chart = this.getPieChartWithMonth(chosenFarm);
 		chart.setTitle("Month Percentage");
@@ -297,7 +307,8 @@ public class Main extends Application {
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
-		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, charts, goBack(arg0));
+		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, charts,
+				goBack(arg0));
 
 		// Return second scene
 		secondScene = new Scene(secondVBox, 1000, 1500);
@@ -379,15 +390,14 @@ public class Main extends Application {
 
 		// Makes the forthScene
 		VBox forthBox = new VBox();
-		forthBox.getChildren().addAll(forthText, monthCombo, monthReportSubmitButton,  goBack(arg0));
+		forthBox.getChildren().addAll(forthText, monthCombo, monthReportSubmitButton, goBack(arg0));
 
 		// Return second scene
 		forthScene = new Scene(forthBox, 1000, 1000);
 		return forthScene;
 	}
 
-	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0,
-			String month) {
+	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0, String month) {
 		// ComboBox
 		Label monthLabel = new Label("Month     ");
 		HBox hBox = new HBox();
@@ -407,9 +417,12 @@ public class Main extends Application {
 		forthText.setFill(Color.BLACK);
 		forthText.setStyle("-fx-font: 20 arial;");
 
+		HBox hbox = new HBox();
+		hbox.getChildren().addAll(tableSpace, goBack(arg0));
+		
 		// Makes the forthScene
 		VBox forthBox = new VBox();
-		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton,  charts, tableSpace, goBack(arg0));
+		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton, charts, hbox);
 
 		// Return second scene
 		forthScene = new Scene(forthBox, 1000, 1000);
@@ -505,7 +518,7 @@ public class Main extends Application {
 			for (int j = startDate; j < endDate; j++) {
 				percentTotle += farmReport.getPercents().get(j);
 			}
-			TableInner tableInner = new TableInner(allFarms.get(i), percentTotle,
+			TableInner tableInner = new TableInner(allFarms.get(i).getID(), percentTotle,
 					allFarms.get(i).getRangeTotal(date1, date2));
 			data.add(tableInner);
 			percentTotle = 0.0;
@@ -570,7 +583,7 @@ public class Main extends Application {
 		}
 	}
 
-	public PieChart getPieChartWithFarmForMonths(String month) {
+	public PieChart getPieChartWithFarmForMonths(String month) {// NOT WORKING, RETURING LIST OF 0'S
 		int num = allFarms.size();
 		ArrayList<String> listOfData = new ArrayList<String>();
 		ArrayList<Double> listOfData2 = new ArrayList<Double>();
@@ -579,12 +592,9 @@ public class Main extends Application {
 		for (int i = 0; i < num; i++) {
 			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
 			listOfData.add(allFarms.get(i).getID());
-			listOfData2.add(farmReport.getPercents().get(chosenMonth));
+			listOfData2.add(farmReport.getPercents().get(i));
 		}
-		System.out.println(listOfData);
-		System.out.println(listOfData2);
-		System.out.println(chosenMonth);
-		for(int i = 0; i < num; i++) {
+		for (int i = 0; i < num; i++) {
 			PieChart.Data pieChart = new PieChart.Data(listOfData.get(i), listOfData2.get(i));
 			finalArray.add(pieChart);
 		}
@@ -599,18 +609,12 @@ public class Main extends Application {
 		TableColumn<String, String> farmTable = new TableColumn<String, String>("Farm");
 		TableColumn<String, String> percent = new TableColumn<String, String>("Total percentage");
 		TableColumn<String, String> totle = new TableColumn<String, String>("Total Weight");
-		FarmReport farmReport;
-		Double percentTotle = 0.0;
 		ObservableList data = FXCollections.observableArrayList();
 		for (int i = 0; i < allFarms.size(); i++) {
-			farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentTotle += farmReport.getPercents().get(j);
-			}
-			TableInner tableInner = new TableInner(allFarms.get(i), percentTotle,
+			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			TableInner tableInner = new TableInner(allFarms.get(i).getID(), farmReport.getPercents().get(i),
 					allFarms.get(i).getYearTotal(2019));
-			data.add(tableInner);
-			percentTotle = 0.0;
+			data.addAll(tableInner.getFarm(), tableInner.getPercent(), tableInner.getWeight());
 		}
 		farmTable.setMinWidth(100);
 		percent.setMinWidth(100);
@@ -657,7 +661,7 @@ public class Main extends Application {
 			for (int j = 0; j < farmReport.getPercents().size(); j++) {
 				percentTotle += farmReport.getPercents().get(j);
 			}
-			TableInner tableInner = new TableInner(allFarms.get(i), percentTotle,
+			TableInner tableInner = new TableInner(allFarms.get(i).getID(), percentTotle,
 					allFarms.get(i).getYearTotal(2019));
 			data.add(tableInner);
 			percentTotle = 0.0;
