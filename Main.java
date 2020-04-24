@@ -51,7 +51,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	// Stores the farm, percent of total weight, and the total weight so it can be
 	// used to make a table
-	public class TableInner {
+	private class TableInner {
 		private final SimpleStringProperty name;
 		private final SimpleStringProperty percent;
 		private final SimpleStringProperty weight;
@@ -198,7 +198,7 @@ public class Main extends Application {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void choiceScene(Stage arg0, Button continueButton) throws IOException {
+	private void choiceScene(Stage arg0, Button continueButton) throws IOException {
 		// Choices scene
 		HBox hBox = new HBox();
 		hBox.getChildren().addAll(farm, month, annual, data);
@@ -257,7 +257,7 @@ public class Main extends Application {
 		close.setOnAction(e -> arg0.close());
 	}
 
-	public Scene fileNotFoundScene(Stage arg0) {
+	private Scene fileNotFoundScene(Stage arg0) {
 		Text secondText = new Text();
 		secondText.setText("File: " + fileName
 				+ " not found. Please go back and change your stupid file name!");
@@ -277,7 +277,7 @@ public class Main extends Application {
 	 * @param choice - scene of choices
 	 * @return the second scene, farm report
 	 */
-	public Scene getSecondScene(Stage arg0) {
+	private Scene getSecondScene(Stage arg0) {
 		// SECOND SCENE
 
 		ArrayList<String> id = new ArrayList<String>();
@@ -310,7 +310,7 @@ public class Main extends Application {
 		return secondScene;
 	}
 
-	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, Farm chosenFarm) {
+	private Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, Farm chosenFarm) {
 		// Pie Chart
 		PieChart chart = this.getPieChartWithMonth(chosenFarm);
 		chart.setTitle("Month Percentage");
@@ -348,7 +348,7 @@ public class Main extends Application {
 	 * @param choice - scene with choices
 	 * @return the third scene, annual report
 	 */
-	public Scene getThirdScene(Stage arg0, Scene choice) {
+	private Scene getThirdScene(Stage arg0, Scene choice) {
 		// Scene thirdScene;
 		Text thirdText = new Text();
 		thirdText.setText("Annual Report");
@@ -386,7 +386,7 @@ public class Main extends Application {
 	 * @param choice - scene with choices
 	 * @return the forth scene, monthly report
 	 */
-	public Scene getForthScene(Stage arg0, Scene choice) {
+	private Scene getForthScene(Stage arg0, Scene choice) {
 		// Scene forthScene;
 
 		// ComboBox
@@ -422,7 +422,7 @@ public class Main extends Application {
 		return forthScene;
 	}
 
-	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0, String month) {
+	private Scene getForthSceneOnceAMonthIsChosen(Stage arg0, String month) {
 		// ComboBox
 		Label monthLabel = new Label("Month     ");
 		HBox hBox = new HBox();
@@ -460,7 +460,7 @@ public class Main extends Application {
 	 * @param choice - the scene with choices
 	 * @return the fifth scene, Data Range Report
 	 */
-	public Scene getFifthScene(Stage arg0, Scene choice) {
+	private Scene getFifthScene(Stage arg0, Scene choice) {
 		// Scene fifthScene;
 		Text fifthText = new Text();
 		fifthText.setText("Data Range Report");
@@ -493,7 +493,7 @@ public class Main extends Application {
 		return fifthScene;
 	}
 
-	public Scene getFifthSceneAfterPickingDate(Stage arg0, LocalDate date1, LocalDate date2) {
+	private Scene getFifthSceneAfterPickingDate(Stage arg0, LocalDate date1, LocalDate date2) {
 		Text fifthText = new Text();
 		fifthText.setText("Data Range Report");
 		fifthText.setFill(Color.BLACK);
@@ -526,7 +526,7 @@ public class Main extends Application {
 		return fifthScene;
 	}
 
-	public VBox getTableForFifthScene(LocalDate date1, LocalDate date2) {
+	private VBox getTableForFifthScene(LocalDate date1, LocalDate date2) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
 		table.setItems(getListForTableFifthScene(date1, date2));
@@ -584,7 +584,7 @@ public class Main extends Application {
 		return barChart;
 	}
 
-	public int getMonthNum(String month) {
+	private int getMonthNum(String month) {
 		if (month.contentEquals("January")) {
 			return 1;
 		} else if (month.contentEquals("February")) {
@@ -612,7 +612,7 @@ public class Main extends Application {
 		}
 	}
 
-	public PieChart getPieChartWithFarmForMonths(String month) {// IDK IF IT WORKS OR NOT
+	private PieChart getPieChartWithFarmForMonths(String month) {// IDK IF IT WORKS OR NOT
 		int num = allFarms.size();
 		ArrayList<String> listOfData = new ArrayList<String>();
 		ArrayList<Double> listOfData2 = new ArrayList<Double>();
@@ -634,7 +634,7 @@ public class Main extends Application {
 		return chart;
 	}
 
-	public VBox getTableForthScene(String chosenMonth) {
+	private VBox getTableForthScene(String chosenMonth) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
 		table.setItems(getListForTableForthScene(chosenMonth));
@@ -666,7 +666,7 @@ public class Main extends Application {
 		return tableInner;
 	}
 
-	public PieChart getPieChartWithFarm() {
+	private PieChart getPieChartWithFarm() {
 		int num = allFarms.size();
 		PieChart.Data pieChart = null;
 		ArrayList<PieChart.Data> listOfData = new ArrayList<PieChart.Data>();
