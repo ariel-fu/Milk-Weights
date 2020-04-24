@@ -75,7 +75,7 @@ public class Year {
   }
 
   /**
-   * Gets the total milk weight for a given weight
+   * Gets the total milk weight for a given month
    * 
    * @param month - user given month
    * @return total milk weight

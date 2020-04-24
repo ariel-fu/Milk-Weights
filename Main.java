@@ -550,13 +550,14 @@ public class Main extends Application {
 		int startDate = date1.getMonthValue();
 		int endDate = date2.getMonthValue();
 		for (int i = 0; i < allFarms.size(); i++) {
-			double percentForYear = 0.0;
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = startDate; j < endDate; j++) {
-				percentForYear += farmReport.getPercents().get(j);
+			double percentForFarm = 0.0;
+			MonthlyReport monthlyReport = null;
+			for(int j = startDate; j < endDate+1; j++) {
+				monthlyReport = new MonthlyReport(hashMap, new Year(2019), j);
+				percentForFarm += monthlyReport.getPercents().get(i);
 			}
 
-			String percentDouble = Double.toString(percentForYear);
+			String percentDouble = Double.toString(percentForFarm);
 			String weightInt = Double.toString(allFarms.get(i).getRangeTotal(date1, date2));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
 		}
@@ -618,9 +619,11 @@ public class Main extends Application {
 		int chosenMonth = getMonthNum(month);
 		ArrayList<PieChart.Data> finalArray = new ArrayList<PieChart.Data>();
 		for (int i = 0; i < num; i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			//FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019),
+					getMonthNum(month));
 			listOfData.add(allFarms.get(i).getID());
-			listOfData2.add(farmReport.getPercents().get(chosenMonth - 1));
+			listOfData2.add(monthlyReport.getPercents().get(i));
 		}
 		for (int i = 0; i < num; i++) {
 			PieChart.Data pieChart = new PieChart.Data(listOfData.get(i), listOfData2.get(i));
@@ -655,15 +658,10 @@ public class Main extends Application {
 		MonthlyReport monthly = new MonthlyReport(hashMap, new Year(2019),
 				getMonthNum(chosenMonth));
 		for (int i = 0; i < allFarms.size(); i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			String percentDouble = Double
-					.toString(monthly.getPercents().get(i));
+			String percentDouble = Double.toString(monthly.getPercents().get(i));
 			String weightInt = Double
 					.toString(allFarms.get(i).getMonthTotal(getMonthNum(chosenMonth), 2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
-			System.out.println(allFarms.get(i).getID());
-			System.out.println(percentDouble);
-			System.out.println(weightInt);
 		}
 		return tableInner;
 	}
@@ -674,10 +672,9 @@ public class Main extends Application {
 		ArrayList<PieChart.Data> listOfData = new ArrayList<PieChart.Data>();
 		Double percentTotle = 0.0;
 		for (int i = 0; i < num; i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentTotle += farmReport.getPercents().get(j);
-			}
+			//FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+			percentTotle += annualReport.getPercents().get(i);
 			pieChart = new PieChart.Data(allFarms.get(i).getID(), percentTotle);
 			listOfData.add(pieChart);
 			percentTotle = 0.0;
@@ -710,10 +707,8 @@ public class Main extends Application {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		for (int i = 0; i < allFarms.size(); i++) {
 			double percentForYear = 0.0;
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentForYear += farmReport.getPercents().get(j);
-			}
+			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+				percentForYear += annualReport.getPercents().get(i);
 			String percentDouble = Double.toString(percentForYear);
 			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
