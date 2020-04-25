@@ -1,6 +1,9 @@
+
 package application;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,76 +32,61 @@ public class AnnualReport extends ReportBase {
     this.year = year.getYear();
   }
 
-  /**
-   * @return list of percents of each farm compared to total amount
+  // TODO: delete the note
+  /*
+   * Note that it does not include methods such as getMin, getMax, getAverage,
+   * getPercentages, etc. It will work because we have runReport() and since
+   * each report uses different calculations, that method has to be different
+   * for each report. However, each getMin, getMax, etc will do the same thing -
+   * return its corresponding variable.
    */
-  public List<Double> getPercents() {
-    List<Double> percents = new ArrayList<Double>();
-    double milkSum = 0;
-    Farm currFarm;
+
+  /**
+   * Runs the report - finds the min, max, average, and calculates the
+   * percentages
+   */
+  @Override
+  public void runReport() {
+    String[] months = new DateFormatSymbols().getMonths();
+    this.percentLabels = new ArrayList<String>();
+    // percent of each farm milk divided by total farm milk for a given year
+    this.percents = new ArrayList<Double>();
+    int total = 0;
+    // iterate through the hashmap to get the total farm milk for a given year
     Iterator farmIt = farms.entrySet().iterator();
     while (farmIt.hasNext()) {
-      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
-      milkSum += currFarm.getYearTotal(year);
-      percents.add((double) currFarm.getYearTotal(year));
+      // get the next farm
+      Farm currFarm = (Farm) farmIt.next();
+      // get the year total of the current farm
+      double currYearTotal = currFarm.getYearTotal(year);
+      // add to the total farm milk
+      total += currYearTotal;
+      percents.add(currYearTotal);
     }
+
+    this.max = percents.get(0);
+    this.min = max;
+
+    // find the min and the max. also calculate the percents list
     for (int i = 0; i < percents.size(); i++) {
-      percents.set(i, percents.get(i) / milkSum);
-    }
-    return percents;
-  }
-
-  /**
-   * @return average of all milk amounts
-   */
-  public double getAvg() {
-    double milkSum = 0;
-    Farm currFarm;
-    Iterator farmIt = farms.entrySet().iterator();
-    while (farmIt.hasNext()) {
-      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
-      milkSum += currFarm.getYearTotal(year);
-    }
-    return milkSum / farms.size();
-  }
-
-  /**
-   * @return minimum of all milk amounts
-   */
-  public double getMin() {
-    double minMilk = 1000;
-    Farm currFarm;
-    Iterator farmIt = farms.entrySet().iterator();
-    while (farmIt.hasNext()) {
-      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
-      if (currFarm.getYearTotal(year) < minMilk) {
-        minMilk = currFarm.getYearTotal(year);
+      double currFarmTotal = percents.get(i);
+      // set the curr pos in the position list to the curr farm's year total/the
+      // total milk for a year
+      percents.set(i, currFarmTotal / total);
+      // see if this milk weight is the new max
+      if (currFarmTotal > max) {
+        this.max = currFarmTotal;
       }
-    }
-    return minMilk;
-  }
-
-  /**
-   * @return maximum of all milk amounts
-   */
-  public double getMax() {
-    double maxMilk = 0;
-    Farm currFarm;
-    Iterator farmIt = farms.entrySet().iterator();
-    while (farmIt.hasNext()) {
-      currFarm = ((Map.Entry<String, Farm>) farmIt.next()).getValue();
-      if (currFarm.getYearTotal(year) > maxMilk) {
-        maxMilk = currFarm.getYearTotal(year);
+      // see if this milk weight is the new min
+      if (currFarmTotal < min) {
+        this.min = currFarmTotal;
       }
+      // add this to the list of months
+      percentLabels.add(months[i]);
     }
-    return maxMilk;
+    // return the average farm milk weight for that year
+    this.average = total / percents.size();
+
   }
-
-@Override
-boolean validateInputs() {
-	// TODO Auto-generated method stub
-	return false;
-}
-
 
 }
