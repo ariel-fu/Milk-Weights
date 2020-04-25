@@ -1,5 +1,7 @@
+
 package application;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,68 +27,59 @@ public class FarmReport extends ReportBase {
     this.year = year;
   }
 
+  // TODO: delete the note
+  /*
+   * Note that it does not include methods such as getMin, getMax, getAverage,
+   * getPercentages, etc. It will work because we have runReport() and since
+   * each report uses different calculations, that method has to be different
+   * for each report. However, each getMin, getMax, etc will do the same thing -
+   * return its corresponding variable.
+   */
+
   /**
-   * This method calculate how much percent does each month contributes towards
-   * the entire year
-   * 
-   * @return an arrayList of percentages of each month
+   * Runs the report - finds the min, max, average and calculates the
+   * percentages
    */
   @Override
-  List<Double> getPercents() {
-    List<Double> list = new ArrayList<Double>();
-    int month = 0;
+  public void runReport() {
+    String[] months = new DateFormatSymbols().getMonths();
+    // sets the max to the first month's total, 0 if the month does not exist
+    this.max = farm.getMonthTotal(1, year);
+    // also set the min to the first month's total
+    this.min = max;
+    this.percents = new ArrayList<Double>();
+    // labels: January, ..., December
+    this.percentLabels = new ArrayList<String>();
+
+    // finds the min and the max
     for (int x = 1; x < 13; x++) {
-      month = farm.getMonthTotal(x, year);
-      list.add((double)((month) / farm.getYearTotal(year)));
+      double monthMilk = farm.getMonthTotal(x, year);
+      if (monthMilk > max)
+        max = monthMilk;
+
+      if (monthMilk < min) {
+        min = monthMilk;
+      }
+
+      this.percents.add(monthMilk);
+      this.percentLabels.add(months[x - 1]);
     }
 
-    return list;
-  }
-
-  /**
-   * This method gets the overall average milk weight for the whole year
-   * 
-   * @return the average weight of milk for the whole year
-   */
-  @Override
-  double getAvg() {
-    return (farm.getYearTotal(year) / 12.0);
-  }
-
-  /**
-   * This method returns the month with the lowest yield of milk
-   */
-  @Override
-  double getMin() {
-    double min = farm.getMonthTotal(1, year);
-    for (int x = 2; x < 13; x++) {
-      double month = farm.getMonthTotal(x, year);
-      if (month < min)
-        min = month;
+    // calculate % & average based on a list of doubles
+    // helper function if this is done in multiple classes
+    double total = 0;
+    int size = percents.size();
+    // gets the total size
+    for (int i = 0; i < size; i++) {
+      total += percents.get(i);
     }
-    return min;
-  }
-
-  /**
-   * This method returns the month with the most yield of milk
-   * 
-   * @return the month that had the most yield of milk
-   **/
-  @Override
-  double getMax() {
-    double max = farm.getMonthTotal(1, year);
-    for (int x = 2; x < 13; x++) {
-      double month = farm.getMonthTotal(x, year);
-      if (month > max)
-        max = month;
+    for (int i = 0; i < size; i++) {
+      percents.set(i, percents.get(i) / total);
     }
-    return max;
+    // calculates average? - should be a list?
+    this.average = total / size;
   }
 
-@Override
-boolean validateInputs() {
-	// TODO Auto-generated method stub
-	return false;
 }
 
-}
+
