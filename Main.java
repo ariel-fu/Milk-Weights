@@ -56,46 +56,49 @@ public class Main extends Application {
 	 * @author prasunguragain
 	 *
 	 */
-	private class TableInner {
+	public class TableInner {
+		// Farm name
 		private final SimpleStringProperty name;
+
+		// Total percentage of weight for a farm
 		private final SimpleStringProperty percent;
+
+		// Total weight for a farm
 		private final SimpleStringProperty weight;
 
+		/**
+		 * Inner class constructor.
+		 * 
+		 * @param farmName - farm name
+		 * @param percent  - total percentage of weight for a farm
+		 * @param weight   - total weight for a farm
+		 */
 		public TableInner(String farmName, String percent, String weight) {
 			this.name = new SimpleStringProperty(farmName);
 			this.percent = new SimpleStringProperty(percent);
 			this.weight = new SimpleStringProperty(weight);
 		}
 
+		// Gets the farm name
 		public String getName() {
 			return name.get();
 		}
 
-		public void setName(String name) {
-			this.name.set(name);
-		}
-
+		// Gets the total percentage of weight for a farm
 		public String getPercent() {
 			return percent.get();
 		}
 
-		public void setPercent(String percent) {
-			this.percent.set(percent);
-		}
-
+		// Gets the total weight for a farm
 		public String getWeight() {
 			return weight.get();
-		}
-
-		public void setDataSensorTwo(String weight) {
-			this.weight.set(weight);
 		}
 	}
 
 	// The scene with the choices
-	Scene choice;
+	Scene choiceScene;
 
-	// The csv file
+	// The CSVFile object
 	CSVFile csv = new CSVFile();
 
 	// The file name given by the user
@@ -107,18 +110,17 @@ public class Main extends Application {
 	// The Data Range Report scene
 	Scene dataRangeReportScene = null;
 	// The Monthly report scene
-	Scene forthScene = null;
+	Scene monthlyReportScene = null;
 	// The Annual Report scene
-	Scene thirdScene = null;
+	Scene annualReportScene = null;
 	// The farm report scene
-	Scene secondScene = null;
+	Scene farmReportScene = null;
 
 	// Buttons that will be used to change to a specified scene chosen by the user
-	Button farm = new Button("Farm Report");
-	Button month = new Button("Month Report");
-	Button annual = new Button("Annual Report");
-	Button data = new Button("Data Range Report");
-	boolean flag = true;
+	Button farmButton = new Button("Farm Report");
+	Button monthButton = new Button("Month Report");
+	Button annualButton = new Button("Annual Report");
+	Button dataRangeButton = new Button("Data Range Report");
 
 	// Array list of all farms
 	private ArrayList<Farm> allFarms = new ArrayList<Farm>();
@@ -136,19 +138,13 @@ public class Main extends Application {
 
 	// Once the user types 2 dates in the data range report scene, they have to
 	// click this button to show the result
-	Button submitDate = new Button("Submit Date");
-
-	// The first date the user chose
-	LocalDate firstDate;
-
-	// The second date the user chose
-	LocalDate secondDate;
+	Button submitDateForDataRangeReport = new Button("Submit Date");
 
 	// Stores the first date picked by the user
-	DatePicker d;
+	DatePicker firstDatePickedForDataRangeReport;
 
 	// Stores the second date picked by the user
-	DatePicker d2;
+	DatePicker secondDatePickedForDataRangeReport;
 
 	@Override
 	public void start(Stage arg0) throws Exception {
@@ -169,8 +165,7 @@ public class Main extends Application {
 		TextField textField = new TextField();
 		Button button = new Button("Submit");
 
-		// If the submit button pressed, then save the file name put in by the user
-		// and
+		// If the submit button pressed, then save the file name put in by the user and
 		// go to choiceScene method, where the choice
 		// scene and all other scenes are made
 		button.setOnAction(e -> {
@@ -204,37 +199,44 @@ public class Main extends Application {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void choiceScene(Stage arg0, Button continueButton) throws IOException {
-		// Choices scene
+	public void choiceScene(Stage arg0, Button continueButton) throws IOException {
+		// Makes the choice scene, for user to pick which data to look at
 		HBox hBox = new HBox();
-		hBox.getChildren().addAll(farm, month, annual, data);
+		hBox.getChildren().addAll(farmButton, monthButton, annualButton, dataRangeButton);
 		VBox vBox = new VBox();
 		Button close = new Button("Close");
 		vBox.getChildren().addAll(new Label("Choose one: "), hBox, close);
-		choice = new Scene(vBox, 500, 100);
+		choiceScene = new Scene(vBox, 500, 100);
 
-		continueButton.setOnAction(e -> arg0.setScene(choice));
+		// If the continue button was pressed in the welcome scene (first scene, the
+		// main scene), then the scene changes to the choice scene
+		continueButton.setOnAction(e -> arg0.setScene(choiceScene));
 
+		// Parse the file given by user and store the farms in an array list
 		hashMap = csv.parseFile(new FileReader(fileName));
 		Collection<Farm> collection = hashMap.values();
 		allFarms = new ArrayList<Farm>(collection);
 
-		// Which button or choice in combo box was pressed
-		farm.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
+		// If the user decides to look at the farm reports
+		farmButton.setOnAction(e -> arg0.setScene(getSecondScene(arg0)));
 
-		// ARIEL: eaiser way to get farm from ID
-		Farm farm = hashMap.get(farmCombo.getValue());
-
+		// Once the user picks a farm in the farm report scene and clicks submit, the
+		// scene will change to a similar scene but now with the bar chart and pie chart
+		// of the farm that was picked
 		farmReportSubmitButton.setOnAction(e -> {
 			for (int i = 0; i < hashMap.size(); i++) {
 				if (farmCombo.getValue() == allFarms.get(i).getID()) {
-					arg0.setScene(
-							// TODO - pass Year as part of the user inputs
-							this.getSecondSceneOnceAFarmIsChosen(arg0, allFarms.get(i), 2019));
+					arg0.setScene(this.getSecondSceneOnceAFarmIsChosen(arg0, allFarms.get(i)));
 				}
 			}
 		});
-		month.setOnAction(e -> arg0.setScene(getForthScene(arg0, choice)));
+
+		// If the user decides to look at the monthly report
+		monthButton.setOnAction(e -> arg0.setScene(getForthScene(arg0, choiceScene)));
+
+		// Once the user picks a month in the monthly report scene and click submit, the
+		// scene will change to a similar scene but now with the bar change, pie chart, and
+		// table of the month that was picked
 		monthReportSubmitButton.setOnAction(e -> {
 			if (getMonthNum(monthCombo.getValue()) == 1) {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "January"));
@@ -262,25 +264,39 @@ public class Main extends Application {
 				arg0.setScene(this.getForthSceneOnceAMonthIsChosen(arg0, "December"));
 			}
 		});
-		annual.setOnAction(e -> arg0.setScene(getThirdScene(arg0, choice)));
-		data.setOnAction(e -> arg0.setScene(getFifthScene(arg0, choice)));
-		submitDate.setOnAction(e -> arg0
-				.setScene(this.getFifthSceneAfterPickingDate(arg0, d.getValue(), d2.getValue())));
+
+		// If the user decides to look at the annual report
+		annualButton.setOnAction(e -> arg0.setScene(getThirdScene(arg0, choiceScene)));
+
+		// If the user decides to look at the data range report
+		dataRangeButton.setOnAction(e -> arg0.setScene(getdataRangeReportScene(arg0, choiceScene)));
+
+		// Once the user picks 2 dates in the data range report class and clicks submit,
+		// the scene will change to a similar scene but now with a table of the month that was
+		// picked
+		submitDateForDataRangeReport
+				.setOnAction(e -> arg0.setScene(this.getdataRangeReportSceneAfterPickingDate(arg0,
+						firstDatePickedForDataRangeReport.getValue(),
+						secondDatePickedForDataRangeReport.getValue())));
+
+		// In the choice scene, if the user clicks the close button, the program stops
 		close.setOnAction(e -> arg0.close());
 	}
 
-	private Scene fileNotFoundScene(Stage arg0) {
-		Text secondText = new Text();
-		secondText.setText("File: " + fileName
-				+ " not found. Please go back and change your stupid file name!");
-		secondText.setFill(Color.BLACK);
-		secondText.setStyle("-fx-font: 30 arial;");
-		HBox hBox = new HBox();
-		hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
-		hBox.setAlignment(Pos.CENTER);
-		Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
-		return fileNotFoundScene;
-	}
+	// TODO: If the user types a wrong file, SHOULD WE DO SOMETHING??? I made a
+	// scene for that but don't know how to use it
+//	public Scene fileNotFoundScene(Stage arg0) {
+//		Text secondText = new Text();
+//		secondText.setText("File: " + fileName
+//				+ " not found. Please go back and change your stupid file name!");
+//		secondText.setFill(Color.BLACK);
+//		secondText.setStyle("-fx-font: 30 arial;");
+//		HBox hBox = new HBox();
+//		hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
+//		hBox.setAlignment(Pos.CENTER);
+//		Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
+//		return fileNotFoundScene;
+//	}
 
 	/**
 	 * Returns the second scene, farm report.
@@ -289,7 +305,7 @@ public class Main extends Application {
 	 * @param choice - scene of choices
 	 * @return the second scene, farm report
 	 */
-	private Scene getSecondScene(Stage arg0) {
+	public Scene getSecondScene(Stage arg0) {
 		// SECOND SCENE
 
 		ArrayList<String> id = new ArrayList<String>();
@@ -318,22 +334,16 @@ public class Main extends Application {
 		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, goBack(arg0));
 
 		// Return second scene
-		secondScene = new Scene(secondVBox, 1000, 1500);
-		return secondScene;
+		farmReportScene = new Scene(secondVBox, 1000, 1500);
+		return farmReportScene;
 	}
 
-	private Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, Farm chosenFarm, int year) {
-
-		// ARIEL: if reportbase 2.0 passes, this goes back to farmreport
-		FarmReport2 report = new FarmReport2(chosenFarm, year);
-		report.runReport();
-
+	public Scene getSecondSceneOnceAFarmIsChosen(Stage arg0, Farm chosenFarm) {
 		// Pie Chart
-		PieChart chart = this.getPieChartWithMonth(report);
+		PieChart chart = this.getPieChartWithMonth(chosenFarm);
 		chart.setTitle("Month Percentage");
 		HBox charts = new HBox();
-		// ARIEL: haha i changed some stuff plz dont get mad prasun
-		charts.getChildren().addAll(this.getBarChart(report), chart);
+		charts.getChildren().addAll(this.getBarChart(chosenFarm), chart);
 
 		Text secondText = new Text();
 		secondText.setText("Farm Report");
@@ -342,12 +352,12 @@ public class Main extends Application {
 
 		Label farm = new Label("Farm     ");
 
-		Label yearLabel = new Label("     Year: 2019");// CHANGE MAYBE
+		Label year = new Label("     Year: 2019");// CHANGE MAYBE
 		Label space = new Label("          ");
 		HBox hBoxSpace = new HBox();
 		hBoxSpace.getChildren().addAll(space);
 		HBox hBoxAll = new HBox();
-		hBoxAll.getChildren().addAll(farm, farmCombo, yearLabel, hBoxSpace);
+		hBoxAll.getChildren().addAll(farm, farmCombo, year, hBoxSpace);
 
 		// Go back to choices
 		VBox secondVBox = new VBox();
@@ -355,8 +365,8 @@ public class Main extends Application {
 				goBack(arg0));
 
 		// Return second scene
-		secondScene = new Scene(secondVBox, 1000, 1500);
-		return secondScene;
+		farmReportScene = new Scene(secondVBox, 1000, 1500);
+		return farmReportScene;
 	}
 
 	/**
@@ -366,7 +376,7 @@ public class Main extends Application {
 	 * @param choice - scene with choices
 	 * @return the third scene, annual report
 	 */
-	private Scene getThirdScene(Stage arg0, Scene choice) {
+	public Scene getThirdScene(Stage arg0, Scene choice) {
 		// Scene thirdScene;
 		Text thirdText = new Text();
 		thirdText.setText("Annual Report");
@@ -393,8 +403,8 @@ public class Main extends Application {
 		thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBack(arg0));
 
 		// Return the third scene
-		thirdScene = new Scene(thirdBox, 1000, 1500);
-		return thirdScene;
+		annualReportScene = new Scene(thirdBox, 1000, 1500);
+		return annualReportScene;
 	}
 
 	/**
@@ -404,7 +414,7 @@ public class Main extends Application {
 	 * @param choice - scene with choices
 	 * @return the forth scene, monthly report
 	 */
-	private Scene getForthScene(Stage arg0, Scene choice) {
+	public Scene getForthScene(Stage arg0, Scene choice) {
 		// Scene forthScene;
 
 		// ComboBox
@@ -436,29 +446,19 @@ public class Main extends Application {
 		forthBox.getChildren().addAll(forthText, monthCombo, monthReportSubmitButton, goBack(arg0));
 
 		// Return second scene
-		forthScene = new Scene(forthBox, 1000, 1000);
-		return forthScene;
+		monthlyReportScene = new Scene(forthBox, 1000, 1000);
+		return monthlyReportScene;
 	}
 
-	private Scene getForthSceneOnceAMonthIsChosen(Stage arg0, String month) {
+	public Scene getForthSceneOnceAMonthIsChosen(Stage arg0, String month) {
 		// ComboBox
 		Label monthLabel = new Label("Month     ");
 		HBox hBox = new HBox();
 		hBox.getChildren().addAll(monthLabel, monthCombo);
 
-		// ARIEL: making this compile dont mind me
-		MonthlyReport report = new MonthlyReport(hashMap, new Year(2019), 12);
-		report.runReport();
-		// haha this won't work bc i don't have a second monthlyreport example...
-		// don't mind the compile error.
-		PieChart pieChart2 = getPieChartWithFarmForMonths(report);
+		PieChart pieChart2 = getPieChartWithFarmForMonths(month);
 		pieChart2.setTitle("Monthly Percentage");
 		HBox charts = new HBox();
-		// ARIEL: has sleep deprivation and needs coffee ... anyways this
-		// getBarChartForMonthReport can be used
-		// for all reports that need a bar chart bc it takes in any class that
-		// extends ReportBase - FarmReport, MonthlyReport, AnnualReport, and
-		// DateRangeReport when we make the class
 		charts.getChildren().addAll(getBarChartForMonthReport(month), pieChart2);
 		Label spacing = new Label("                                                 ");
 		HBox tableSpace = new HBox();
@@ -477,8 +477,8 @@ public class Main extends Application {
 		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton, charts, hbox);
 
 		// Return second scene
-		forthScene = new Scene(forthBox, 1000, 1000);
-		return forthScene;
+		monthlyReportScene = new Scene(forthBox, 1000, 1000);
+		return monthlyReportScene;
 	}
 
 	/**
@@ -488,8 +488,8 @@ public class Main extends Application {
 	 * @param choice - the scene with choices
 	 * @return the fifth scene, Data Range Report
 	 */
-	private Scene getFifthScene(Stage arg0, Scene choice) {
-		// Scene fifthScene;
+	public Scene getdataRangeReportScene(Stage arg0, Scene choice) {
+		// Scene dataRangeReportScene;
 		Text fifthText = new Text();
 		fifthText.setText("Data Range Report");
 		fifthText.setFill(Color.BLACK);
@@ -499,10 +499,10 @@ public class Main extends Application {
 		Label data = new Label("Data Range:     ");
 		TilePane r = new TilePane();
 		TilePane r2 = new TilePane();
-		d = new DatePicker();
-		d2 = new DatePicker();
-		r.getChildren().add(d);
-		r2.getChildren().add(d2);
+		firstDatePickedForDataRangeReport = new DatePicker();
+		secondDatePickedForDataRangeReport = new DatePicker();
+		r.getChildren().add(firstDatePickedForDataRangeReport);
+		r2.getChildren().add(secondDatePickedForDataRangeReport);
 		HBox hBoxAll = new HBox();
 		HBox hBoxAll2 = new HBox();
 		VBox calendar = new VBox();
@@ -510,7 +510,8 @@ public class Main extends Application {
 		hBoxAll2.getChildren().addAll(r2);
 		Label space = new Label("     ");
 		Label space2 = new Label("     ");
-		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2, submitDate);
+		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2,
+				submitDateForDataRangeReport);
 
 		// Go back to choices
 		VBox fifthBox = new VBox();
@@ -521,7 +522,8 @@ public class Main extends Application {
 		return dataRangeReportScene;
 	}
 
-	private Scene getFifthSceneAfterPickingDate(Stage arg0, LocalDate date1, LocalDate date2) {
+	public Scene getdataRangeReportSceneAfterPickingDate(Stage arg0, LocalDate date1,
+			LocalDate date2) {
 		Text fifthText = new Text();
 		fifthText.setText("Data Range Report");
 		fifthText.setFill(Color.BLACK);
@@ -542,22 +544,23 @@ public class Main extends Application {
 		hBoxAll2.getChildren().addAll(r2);
 		Label space = new Label("     ");
 		Label space2 = new Label("     ");
-		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2, submitDate);
+		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2,
+				submitDateForDataRangeReport);
 
 		// Go back to choices
 		VBox fifthBox = new VBox();
-		fifthBox.getChildren().addAll(fifthText, calendar, getTableForFifthScene(date1, date2),
-				goBack(arg0));
+		fifthBox.getChildren().addAll(fifthText, calendar,
+				getTableFordataRangeReportScene(date1, date2), goBack(arg0));
 
 		// Return fifth scene
 		dataRangeReportScene = new Scene(fifthBox, 1000, 1500);
 		return dataRangeReportScene;
 	}
 
-	private VBox getTableForFifthScene(LocalDate date1, LocalDate date2) {
+	public VBox getTableFordataRangeReportScene(LocalDate date1, LocalDate date2) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
-		table.setItems(getListForTableFifthScene(date1, date2));
+		table.setItems(getListForTabledataRangeReportScene(date1, date2));
 		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
 		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
 		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
@@ -573,25 +576,28 @@ public class Main extends Application {
 		return vbox;
 	}
 
-	private ObservableList<TableInner> getListForTableFifthScene(LocalDate date1, LocalDate date2) {
+	private ObservableList<TableInner> getListForTabledataRangeReportScene(LocalDate date1,
+			LocalDate date2) {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		int startDate = date1.getMonthValue();
 		int endDate = date2.getMonthValue();
+		ArrayList<Double> percentForFarm = new ArrayList<Double>();
 		for (int i = 0; i < allFarms.size(); i++) {
-			double percentForYear = 0.0;
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = startDate; j < endDate; j++) {
-				percentForYear += farmReport.getPercents().get(j);
+			// TODO: i will be 0 in first loop, 0 month does not make sense, NEED TO FIX!
+			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019), i);
+			for (int j = startDate; j < endDate + 1; j++) {
+				percentForFarm.add(monthlyReport.getPercents().get(j));
 			}
-
-			String percentDouble = Double.toString(percentForYear);
-			String weightInt = Double.toString(allFarms.get(i).getRangeTotal(date1, date2));
-			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
+		}
+		for (int k = 0; k < allFarms.size(); k++) {
+			String percentDouble = Double.toString(percentForFarm.get(k));
+			String weightInt = Double.toString(allFarms.get(k).getRangeTotal(date1, date2));
+			tableInner.add(new TableInner(allFarms.get(k).getID(), percentDouble, weightInt));
 		}
 		return tableInner;
 	}
 
-	private BarChart getBarChartForMonthReport(String month) {
+	public BarChart getBarChartForMonthReport(String month) {
 		CategoryAxis xAxis = new CategoryAxis();
 		xAxis.setLabel("");
 		NumberAxis yAxis = new NumberAxis();
@@ -611,7 +617,7 @@ public class Main extends Application {
 		return barChart;
 	}
 
-	private int getMonthNum(String month) {
+	public int getMonthNum(String month) {
 		if (month.contentEquals("January")) {
 			return 1;
 		} else if (month.contentEquals("February")) {
@@ -639,49 +645,21 @@ public class Main extends Application {
 		}
 	}
 
-	private PieChart getPieChartWithFarmForMonths(ReportBase2 report) {// IDK IF IT
-																		// WORKS
-		// OR NOT (probs yes) goo prasun :)
-		// ADD JAVADOCS DEAR GOD DUDE good code tho :) really appreciate the effort
-		// into the font. 120/10 approval.
-		// gets the labels of the percentages, conventiently in an ArrayList :)
-		List<String> listOfLabels = report.getPercentLabels();
-		// gets the percentages of the files into a list
-		List<Double> listOfPercentages = report.getPercents();
-		// BOOM, now you have a list of labels, a list of percentages, and one less
-		// for loop!
-
-		// ARIEL: this looks good (and uber complicated), but i made a new method
-		// for u to use prasun, look above
+	public PieChart getPieChartWithFarmForMonths(String month) {// IDK IF IT WORKS OR NOT
 		int num = allFarms.size();
 		ArrayList<String> listOfData = new ArrayList<String>();
 		ArrayList<Double> listOfData2 = new ArrayList<Double>();
-		// to the best of my knowledge, which is a little, you probs won't need
-		// this...??
-		// int chosenMonth = getMonthNum(month);
-
+		int chosenMonth = getMonthNum(month);
 		ArrayList<PieChart.Data> finalArray = new ArrayList<PieChart.Data>();
-		// highlight the area below that is commented out, press ctrl then a "/" to
-		// get rid of block comments (cuz the new code might not be what you want)
-//	    for (int i = 0; i < num; i++) {
-//	      FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-//	      listOfData.add(allFarms.get(i).getID());
-//	      listOfData2.add(farmReport.getPercents().get(chosenMonth - 1));
-//	    }
-//	    for (int i = 0; i < num; i++) {
-//	      PieChart.Data pieChart = new PieChart.Data(listOfData.get(i),
-//	          listOfData2.get(i));
-//	      finalArray.add(pieChart);
-//	    }
-
-		// NEW CODE: (from ARIEL), works the same way with one less for loop. Plus
-		// as our GUIer, you should call methods left and right and not worry about
-		// what is in them. tell us backenders what you need and we'll get it for
-		// you
-		// sincerely, the backenders
 		for (int i = 0; i < num; i++) {
-			PieChart.Data pieChart = new PieChart.Data(listOfLabels.get(i),
-					listOfPercentages.get(i));
+			// FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019),
+					getMonthNum(month));
+			listOfData.add(allFarms.get(i).getID());
+			listOfData2.add(monthlyReport.getPercents().get(i));
+		}
+		for (int i = 0; i < num; i++) {
+			PieChart.Data pieChart = new PieChart.Data(listOfData.get(i), listOfData2.get(i));
 			finalArray.add(pieChart);
 		}
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(finalArray);
@@ -689,7 +667,7 @@ public class Main extends Application {
 		return chart;
 	}
 
-	private VBox getTableForthScene(String chosenMonth) {
+	public VBox getTableForthScene(String chosenMonth) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
 		table.setItems(getListForTableForthScene(chosenMonth));
@@ -713,29 +691,23 @@ public class Main extends Application {
 		MonthlyReport monthly = new MonthlyReport(hashMap, new Year(2019),
 				getMonthNum(chosenMonth));
 		for (int i = 0; i < allFarms.size(); i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			String percentDouble = Double
-					.toString(monthly.getPercents().get(getMonthNum(chosenMonth)));
+			String percentDouble = Double.toString(monthly.getPercents().get(i));
 			String weightInt = Double
 					.toString(allFarms.get(i).getMonthTotal(getMonthNum(chosenMonth), 2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
-			System.out.println(allFarms.get(i).getID());
-			System.out.println(percentDouble);
-			System.out.println(weightInt);
 		}
 		return tableInner;
 	}
 
-	private PieChart getPieChartWithFarm() {
+	public PieChart getPieChartWithFarm() {
 		int num = allFarms.size();
 		PieChart.Data pieChart = null;
 		ArrayList<PieChart.Data> listOfData = new ArrayList<PieChart.Data>();
 		Double percentTotle = 0.0;
 		for (int i = 0; i < num; i++) {
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentTotle += farmReport.getPercents().get(j);
-			}
+			// FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
+			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+			percentTotle += annualReport.getPercents().get(i);
 			pieChart = new PieChart.Data(allFarms.get(i).getID(), percentTotle);
 			listOfData.add(pieChart);
 			percentTotle = 0.0;
@@ -745,7 +717,7 @@ public class Main extends Application {
 		return chart;
 	}
 
-	private VBox getTable() {
+	public VBox getTable() {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
 		table.setItems(getListForTable());
@@ -768,10 +740,8 @@ public class Main extends Application {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		for (int i = 0; i < allFarms.size(); i++) {
 			double percentForYear = 0.0;
-			FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
-			for (int j = 0; j < farmReport.getPercents().size(); j++) {
-				percentForYear += farmReport.getPercents().get(j);
-			}
+			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+			percentForYear += annualReport.getPercents().get(i);
 			String percentDouble = Double.toString(percentForYear);
 			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
@@ -779,7 +749,7 @@ public class Main extends Application {
 		return tableInner;
 	}
 
-	private BarChart getBarChart(ReportBase2 report) {
+	public BarChart getBarChart(Farm chosenFarm) {
 		// Bar Chart
 		CategoryAxis xAxis = new CategoryAxis();
 		xAxis.setLabel("");
@@ -790,31 +760,39 @@ public class Main extends Application {
 		dataSeries1.setName("Milk Weights");
 
 		// Making the bar chart from info from FarmReport
-		dataSeries1.getData().add(new XYChart.Data("Min", report.getMin()));
-		dataSeries1.getData().add(new XYChart.Data("Average", report.getAvg()));
-		dataSeries1.getData().add(new XYChart.Data("Max", report.getMax()));
+		FarmReport farmReport = new FarmReport(chosenFarm, 2019);// CHANGE YEAR MAYBE
+		dataSeries1.getData().add(new XYChart.Data("Min", farmReport.getMin()));
+		dataSeries1.getData().add(new XYChart.Data("Average", farmReport.getAvg()));
+		dataSeries1.getData().add(new XYChart.Data("Max", farmReport.getMax()));
 		barChart.getData().add(dataSeries1);
 		return barChart;
 	}
 
-	private Button goBack(Stage arg0) {
+	public Button goBack(Stage arg0) {
 		Button goBack = new Button("Go Back");
-		goBack.setOnAction(e -> arg0.setScene(choice));
+		goBack.setOnAction(e -> arg0.setScene(choiceScene));
 		return goBack;
 	}
 
-	private PieChart getPieChartWithMonth(ReportBase2 report) {
-	    List<Double> percentage = report.getPercents();
-	    // ARIEL: THIS IS BROKEN, i would 10/10 recommend fixing thx
-	    ObservableList<PieChart.Data> pieChartData = ObservableList<PieChart.Data>();
-
-	    // ARIEL: add both the label and the percentage from the ReportBase class
-	    for (int i=0; i<percentage.size(); i++) {
-	        pieChartData.add( new PieChart.Data(report.percentLabels().get(i), percentage.get(i)));
-	    }
-	    PieChart chart = new PieChart(pieChartData);
-	    return chart;
-	  }
+	public PieChart getPieChartWithMonth(Farm chosenFarm) {
+		FarmReport farmReport = new FarmReport(chosenFarm, 2019);
+		List<Double> percentage = farmReport.getPercents();
+		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+				new PieChart.Data("Jan", percentage.get(0)),
+				new PieChart.Data("Feb", percentage.get(1)),
+				new PieChart.Data("Mar", percentage.get(2)),
+				new PieChart.Data("Apr", percentage.get(3)),
+				new PieChart.Data("May", percentage.get(4)),
+				new PieChart.Data("Jun", percentage.get(5)),
+				new PieChart.Data("Jul", percentage.get(6)),
+				new PieChart.Data("Aug", percentage.get(7)),
+				new PieChart.Data("Sep", percentage.get(8)),
+				new PieChart.Data("Oct", percentage.get(9)),
+				new PieChart.Data("Nov", percentage.get(10)),
+				new PieChart.Data("Dec", percentage.get(11)));
+		PieChart chart = new PieChart(pieChartData);
+		return chart;
+	}
 
 	/**
 	 * Main method to launch the application.
