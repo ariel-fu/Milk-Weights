@@ -387,6 +387,7 @@ public class Main extends Application {
 	 */
 	public PieChart getPieChartForFarmReport(Farm chosenFarm) {
 		FarmReport farmReport = new FarmReport(chosenFarm, 2019);
+		farmReport.runReport();
 		List<Double> percentage = farmReport.getPercents();
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
 				new PieChart.Data("Jan", percentage.get(0)),
@@ -422,10 +423,12 @@ public class Main extends Application {
 		dataSeries1.setName("Milk Weights");
 
 		// Making the bar chart from info from FarmReport
-		FarmReport farmReport = new FarmReport(chosenFarm, 2019);// CHANGE YEAR MAYBE
-		dataSeries1.getData().add(new XYChart.Data("Min", farmReport.getMin()));
-		dataSeries1.getData().add(new XYChart.Data("Average", farmReport.getAvg()));
-		dataSeries1.getData().add(new XYChart.Data("Max", farmReport.getMax()));
+		FarmReport farmReport = new FarmReport(chosenFarm, 2019);
+		farmReport.runReport();
+		System.out.println(farmReport.min + "   " + farmReport.average + "     " + farmReport.max);
+		dataSeries1.getData().add(new XYChart.Data("Min", farmReport.min));
+		dataSeries1.getData().add(new XYChart.Data("Average", farmReport.average));
+		dataSeries1.getData().add(new XYChart.Data("Max", farmReport.max));
 		barChart.getData().add(dataSeries1);
 		return barChart;
 	}
@@ -446,8 +449,7 @@ public class Main extends Application {
 
 		// ComboBox
 		Label year = new Label("          Year:    ");
-		Label year2019 = new Label("2019");// MAYBE CHANGE YEAR
-		// Button reload = new Button("Reload"); PORBABLY DON'T NEED THIS
+		Label year2019 = new Label("2019");
 		HBox hBoxSpace = new HBox();
 		HBox hBoxAll = new HBox();
 		hBoxAll.getChildren().addAll(year, year2019, hBoxSpace);
@@ -481,6 +483,7 @@ public class Main extends Application {
 		for (int i = 0; i < num; i++) {
 			// FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
 			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+			annualReport.runReport();
 			percentTotle += annualReport.getPercents().get(i);
 			pieChart = new PieChart.Data(allFarms.get(i).getID(), percentTotle);
 			listOfData.add(pieChart);
@@ -519,13 +522,14 @@ public class Main extends Application {
 	 * Helper method for getTableForAnnualReportScene() to return a list of info to
 	 * put on the table.
 	 * 
-	 * @return a list of info to pul on the table.
+	 * @return a list of info to put on the table.
 	 */
 	private ObservableList<TableInner> getListForTableForAnnualReportScene() {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		for (int i = 0; i < allFarms.size(); i++) {
 			double percentForYear = 0.0;
 			AnnualReport annualReport = new AnnualReport(hashMap, new Year(2019));
+			annualReport.runReport();
 			percentForYear += annualReport.getPercents().get(i);
 			String percentDouble = Double.toString(percentForYear);
 			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
@@ -633,11 +637,11 @@ public class Main extends Application {
 
 		MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019),
 				getMonthNum(chosenMonth));
-
+		monthlyReport.runReport();
 		// Making the bar chart from info from Monthly Report
-		dataSeries1.getData().add(new XYChart.Data("Min", monthlyReport.getMin()));
-		dataSeries1.getData().add(new XYChart.Data("Average", monthlyReport.getAvg()));
-		dataSeries1.getData().add(new XYChart.Data("Max", monthlyReport.getMax()));
+		dataSeries1.getData().add(new XYChart.Data("Min", monthlyReport.min));
+		dataSeries1.getData().add(new XYChart.Data("Average", monthlyReport.average));
+		dataSeries1.getData().add(new XYChart.Data("Max", monthlyReport.max));
 		barChart.getData().add(dataSeries1);
 		return barChart;
 	}
@@ -649,16 +653,16 @@ public class Main extends Application {
 	 * @param chosenMonth - the month chosen by the user
 	 * @return a pie chart
 	 */
-	public PieChart getPieChartForMonthlyReportScene(String month) {
+	public PieChart getPieChartForMonthlyReportScene(String chosenMonth) {
 		int num = allFarms.size();
 		ArrayList<String> listOfData = new ArrayList<String>();
 		ArrayList<Double> listOfData2 = new ArrayList<Double>();
-		int chosenMonth = getMonthNum(month);
 		ArrayList<PieChart.Data> finalArray = new ArrayList<PieChart.Data>();
 		for (int i = 0; i < num; i++) {
 			// FarmReport farmReport = new FarmReport(allFarms.get(i), 2019);
 			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019),
-					getMonthNum(month));
+					getMonthNum(chosenMonth));
+			monthlyReport.runReport();
 			listOfData.add(allFarms.get(i).getID());
 			listOfData2.add(monthlyReport.getPercents().get(i));
 		}
@@ -672,7 +676,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * return the table for the monthly report scene table.
+	 * Return the table for the monthly report scene table.
 	 * 
 	 * @param chosenMonth - the month chosen by the user
 	 * @return the table
@@ -707,6 +711,7 @@ public class Main extends Application {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		MonthlyReport monthly = new MonthlyReport(hashMap, new Year(2019),
 				getMonthNum(chosenMonth));
+		monthly.runReport();
 		for (int i = 0; i < allFarms.size(); i++) {
 			String percentDouble = Double.toString(monthly.getPercents().get(i));
 			String weightInt = Double
@@ -837,21 +842,30 @@ public class Main extends Application {
 	private ObservableList<TableInner> getListForTableDataRangeReportScene(LocalDate date1,
 			LocalDate date2) {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
-		int startDate = date1.getMonthValue();
-		int endDate = date2.getMonthValue();
-		ArrayList<Double> percentForFarm = new ArrayList<Double>();
+		DateRangeReport dateRangeReport = new DateRangeReport(hashMap, date1, date2);
+		dateRangeReport.runReport();
 		for (int i = 0; i < allFarms.size(); i++) {
-			// TODO: i will be 0 in first loop, 0 month does not make sense, NEED TO FIX!
-			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019), i);
-			for (int j = startDate; j < endDate + 1; j++) {
-				percentForFarm.add(monthlyReport.getPercents().get(j));
-			}
+			String percentDouble = Double.toString(dateRangeReport.percents.get(i));
+			String weightInt = Double.toString(dateRangeReport.getTotalPerFarm().get(i));
+			tableInner.add(
+					new TableInner(dateRangeReport.percentLabels.get(i), percentDouble, weightInt));
 		}
-		for (int k = 0; k < allFarms.size(); k++) {
-			String percentDouble = Double.toString(percentForFarm.get(k));
-			String weightInt = Double.toString(allFarms.get(k).getRangeTotal(date1, date2));
-			tableInner.add(new TableInner(allFarms.get(k).getID(), percentDouble, weightInt));
-		}
+//		int startDate = date1.getMonthValue();
+//		int endDate = date2.getMonthValue();
+//		ArrayList<Double> percentForFarm = new ArrayList<Double>();
+//		for (int i = 0; i < allFarms.size(); i++) {
+//			// TODO: i will be 0 in first loop, 0 month does not make sense, NEED TO FIX!
+//			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019), i);
+//			monthlyReport.runReport();
+//			for (int j = startDate; j < endDate + 1; j++) {
+//				percentForFarm.add(monthlyReport.getPercents().get(j));
+//			}
+//		}
+//		for (int k = 0; k < allFarms.size(); k++) {
+//			String percentDouble = Double.toString(percentForFarm.get(k));
+//			String weightInt = Double.toString(allFarms.get(k).getRangeTotal(date1, date2));
+//			tableInner.add(new TableInner(allFarms.get(k).getID(), percentDouble, weightInt));
+//		}
 		return tableInner;
 	}
 

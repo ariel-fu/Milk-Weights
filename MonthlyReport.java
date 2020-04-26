@@ -2,6 +2,7 @@
 package application;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -52,8 +53,13 @@ public class MonthlyReport extends ReportBase {
     // percent of each farm milk divided by total farm milk for a given year
     this.percents = new ArrayList<Double>();
     int total = 0;
+    
+    //Prasun: first gets the farms from hashMaps
+    Collection<Farm> collection = farms.values();
     // iterate through the hashmap to get the total farm milk for a given year
-    Iterator farmIt = farms.entrySet().iterator();
+    Iterator farmIt = collection.iterator();
+    
+    
     while (farmIt.hasNext()) {
       // get the next farm
       Farm currFarm = (Farm) farmIt.next();
