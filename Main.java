@@ -94,7 +94,7 @@ public class Main extends Application {
 			return weight.get();
 		}
 	}
-
+    //Scene
 	// The scene with the choices
 	Scene choiceScene;
 
