@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class models a reader for CSV files. Should be able to parse and send
@@ -14,7 +15,7 @@ import java.util.HashMap;
  * 
  *
  */
-public class CSVFile extends FarmFile {
+public class CSVFile {
 
   private HashMap<String, Farm> map;
 
@@ -96,5 +97,18 @@ public class CSVFile extends FarmFile {
     return hm;
   }
 
-  // TODO: figure out how to write to a CSV file...
+  /**
+   * Writes to the file when prompted by the user. Writes the report data
+   * 
+   * @param reportName  - name of report: FarmReport, MonthlyReport,
+   *                    AnnualReport, or DateRangeReport
+   * @param min         - the min of that report
+   * @param max         - max of report
+   * @param average     - average of report
+   * @param percentages - list of percentages used in the pie chart
+   */
+  public void writeToAFile(String reportName, double min, double max,
+      double average, List<Double> percentages) {
+
+  }
 }
