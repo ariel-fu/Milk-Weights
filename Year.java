@@ -10,7 +10,7 @@ import java.time.LocalDate;
  * @author Alex, Ariel, Catherine, Harry, Prasun
  *
  */
-public class Year {  
+public class Year {
 
   private int year; // represents what year it is
   // TODO: change to private
@@ -231,8 +231,3 @@ public class Year {
   }
 
 }
-
-
-
-
-
