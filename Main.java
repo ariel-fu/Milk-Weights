@@ -205,7 +205,10 @@ public class Main extends Application {
 		hBox.getChildren().addAll(farmButton, monthButton, annualButton, dataRangeButton);
 		VBox vBox = new VBox();
 		Button close = new Button("Close");
-		vBox.getChildren().addAll(new Label("Choose one: "), hBox, close);
+		HBox closeAndSave = new HBox();
+		Button saveFile = new Button("Save to the file");
+		closeAndSave.getChildren().addAll(close, saveFile);
+		vBox.getChildren().addAll(new Label("Choose one: "), hBox, closeAndSave);
 		choiceScene = new Scene(vBox, 500, 100);
 
 		// If the continue button was pressed in the welcome scene (first scene, the
@@ -284,7 +287,10 @@ public class Main extends Application {
 
 		// In the choice scene, if the user clicks the close button, the program stops
 		close.setOnAction(e -> arg0.close());
+		
+		//saveFile.setOnAction(e -> return null);
 	}
+
 
 	// TODO: If the user types a wrong file, SHOULD WE DO SOMETHING??? I made a
 	// scene for that but don't know how to use it

@@ -14,7 +14,7 @@ import java.util.HashMap;
  * 
  *
  */
-public class CSVFile extends FarmFile {
+public class CSVFile extends farmFile{
 
   private HashMap<String, Farm> map;
 
