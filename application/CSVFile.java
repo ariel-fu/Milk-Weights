@@ -2,8 +2,11 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,15 +103,63 @@ public class CSVFile {
   /**
    * Writes to the file when prompted by the user. Writes the report data
    * 
-   * @param reportName  - name of report: FarmReport, MonthlyReport,
-   *                    AnnualReport, or DateRangeReport
-   * @param min         - the min of that report
-   * @param max         - max of report
-   * @param average     - average of report
-   * @param percentages - list of percentages used in the pie chart
+   * @param reportName        - name of report: FarmReport, MonthlyReport,
+   *                          AnnualReport, or DateRangeReport
+   * @param min               - the min of that report
+   * @param max               - max of report
+   * @param average           - average of report
+   * @param percentages       - list of percentages used in the pie chart
+   * @param percentagesLables - list of labels associated with the percentages
+   * @param fileName          - name of the file to write to
+   * @throws IOException - if the file is not found
+   * 
    */
   public void writeToAFile(String reportName, double min, double max,
-      double average, List<Double> percentages) {
+      double average, List<Double> percentages, List<String> percentagesLabels,
+      String fileName) throws IOException {
+    PrintWriter csvWriter = new PrintWriter("fileName");
+    csvWriter.write("Name, min, max, average");
 
+    // create a string to write onto the csv file
+    String dataString = reportName + "\r\n" + "min: " + min + "\r\n" + "max: "
+        + max + "\r\n" + "average: " + average + "";
+    csvWriter.write("\r\n");
+    csvWriter.write(dataString);
+    csvWriter.write("\r\n");
+    // create a list that associates a percentage with its label
+    String typeOfPercentage = this.getTypeOfPercentage(reportName);
+    csvWriter.write("Percents, " + typeOfPercentage);
+    csvWriter.write("\r\n");
+    List<List<String>> percentsData = new ArrayList<List<String>>();
+    for (int i = 0; i < percentages.size(); i++) {
+      List<String> currData = Arrays.asList("" + percentages.get(i),
+          percentagesLabels.get(i));
+      percentsData.add(currData);
+    }
+
+    for (List<String> currPercent : percentsData) {
+      csvWriter.write("" + currPercent);
+      csvWriter.write("\r\n");
+    }
+
+    // flush and close the PrintWriter
+    csvWriter.flush();
+    csvWriter.close();
+  }
+
+  /**
+   * Gets the type of percentage for a specified report
+   * 
+   * @param reportName - specified report
+   * @return a String that describes what kind of percentage the report has
+   */
+  private String getTypeOfPercentage(String reportName) {
+    if (reportName.equalsIgnoreCase("Farm Report")) {
+      return "Month";
+    } else if (reportName.equalsIgnoreCase("Annual Report")) {
+      return "Year";
+    } else {
+      return "FarmID";
+    }
   }
 }
