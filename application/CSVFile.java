@@ -1,6 +1,7 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -109,15 +110,14 @@ public class CSVFile {
    * @param max               - max of report
    * @param average           - average of report
    * @param percentages       - list of percentages used in the pie chart
-   * @param percentagesLables - list of labels associated with the percentages
-   * @param fileName          - name of the file to write to
+   * @param percentagesLables - list of labels associated with the percentagesS
    * @throws IOException - if the file is not found
    * 
    */
   public void writeToAFile(String reportName, double min, double max,
-      double average, List<Double> percentages, List<String> percentagesLabels,
-      String fileName) throws IOException {
-    PrintWriter csvWriter = new PrintWriter("fileName");
+      double average, List<Double> percentages, List<String> percentagesLabels)
+      throws IOException {
+    PrintWriter csvWriter = new PrintWriter("reportData");
     csvWriter.write("Name, min, max, average");
 
     // create a string to write onto the csv file
