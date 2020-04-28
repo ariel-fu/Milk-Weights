@@ -73,12 +73,27 @@ public class DateRangeReport extends ReportBase {
 			// get the next farm
 			Farm currFarm = (Farm) farmIt.next();
 			// get the year total of the current farm
-			double currMonthTotal = currFarm.getRangeTotal(day1, day2);
+			double currMonthTotal = 0;
+			int year1 = day1.getYear();
+			int year2 = day2.getYear();
+			if (currFarm.getYearTotal(year1) != -1 && currFarm.getYearTotal(year2) != -1) {
+				currMonthTotal = currFarm.getRangeTotal(day1, day2);
+			}
 			// add to the total farm milk
 			total += currMonthTotal;
 			percents.add(currMonthTotal);
 			// add the current farm's id to the list of IDs
 			percentLabels.add(currFarm.getID());
+
+//			// get the next farm
+//			Farm currFarm = (Farm) farmIt.next();
+//			// get the year total of the current farm
+//			double currMonthTotal = currFarm.getRangeTotal(day1, day2);
+//			// add to the total farm milk
+//			total += currMonthTotal;
+//			percents.add(currMonthTotal);
+//			// add the current farm's id to the list of IDs
+//			percentLabels.add(currFarm.getID());
 		}
 
 		this.max = percents.get(0);
