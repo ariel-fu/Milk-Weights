@@ -147,6 +147,11 @@ public class Main extends Application {
 	// Stores the second date picked by the user
 	DatePicker secondDatePickedForDataRangeReport;
 
+	Button saveFileFarmReport = new Button("Save to the file");
+	Button saveFileAnnualReport = new Button("Save to the file");
+	Button saveFileMonthlyReport = new Button("Save to the file");
+	Button saveFileDataRangeReport = new Button("Save to the file");
+
 	@Override
 	public void start(Stage arg0) throws Exception {
 
@@ -207,8 +212,7 @@ public class Main extends Application {
 		VBox vBox = new VBox();
 		Button close = new Button("Close");
 		HBox closeAndSave = new HBox();
-		Button saveFile = new Button("Save to the file");
-		closeAndSave.getChildren().addAll(close, saveFile);
+		closeAndSave.getChildren().addAll(close);
 		vBox.getChildren().addAll(new Label("Choose one: "), hBox, closeAndSave);
 		choiceScene = new Scene(vBox, 500, 100);
 
@@ -288,22 +292,6 @@ public class Main extends Application {
 
 		// In the choice scene, if the user clicks the close button, the program stops
 		close.setOnAction(e -> arg0.close());
-
-		saveFile.setOnAction(e -> arg0.setScene(getSaveFileScene(arg0)));
-	}
-
-	private Scene getSaveFileScene(Stage arg) {
-		Scene saveFileScene = null;
-		Text secondText = new Text();
-		secondText.setText("SAVED!");
-		secondText.setFill(Color.BLACK);
-		secondText.setStyle("-fx-font: 50 arial;");
-		VBox vbox = new VBox();
-		vbox.getChildren().addAll(secondText, goBack(arg));
-		vbox.setAlignment(Pos.CENTER);
-		saveFileScene = new Scene(vbox, 200, 300);
-		return saveFileScene;
-
 	}
 
 	// TODO: If the user types a wrong file, SHOULD WE DO SOMETHING??? I made a
@@ -373,7 +361,7 @@ public class Main extends Application {
 		PieChart chart = this.getPieChartForFarmReport(chosenFarm);
 		chart.setTitle("Month Percentage");
 		HBox charts = new HBox();
-		charts.getChildren().addAll(this.getBarChartForFarmReportScene(chosenFarm), chart);
+		charts.getChildren().addAll(this.getBarChartForFarmReportScene(chosenFarm, arg0), chart);
 
 		Text secondText = new Text();
 		secondText.setText("Farm Report");
@@ -389,14 +377,38 @@ public class Main extends Application {
 		HBox hBoxAll = new HBox();
 		hBoxAll.getChildren().addAll(farm, farmCombo, year, hBoxSpace);
 
+		HBox goBackAndSave = new HBox();
+		goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileFarmReport);
+
 		// Go back to choices
 		VBox secondVBox = new VBox();
 		secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton, charts,
-				goBack(arg0));
+				goBackAndSave);
 
 		// Return second scene
 		farmReportScene = new Scene(secondVBox, 1000, 1500);
 		return farmReportScene;
+	}
+
+	/**
+	 * Scene that lets the user know the file is saved and saved the file given by
+	 * the user.
+	 * 
+	 * @param arg -arg
+	 * @return the scene that says "Saved!"
+	 */
+	private Scene getSaveFileScene(Stage arg) {
+		Scene saveFileScene = null;
+		Text secondText = new Text();
+		secondText.setText("SAVED!");
+		secondText.setFill(Color.BLACK);
+		secondText.setStyle("-fx-font: 50 arial;");
+		VBox vbox = new VBox();
+		vbox.getChildren().addAll(secondText, goBack(arg));
+		vbox.setAlignment(Pos.CENTER);
+		saveFileScene = new Scene(vbox, 200, 300);
+		return saveFileScene;
+
 	}
 
 	/**
@@ -432,7 +444,7 @@ public class Main extends Application {
 	 * @param chosenFarm - the farm chosen by the user
 	 * @return a bar chart for the farm report scene
 	 */
-	public BarChart getBarChartForFarmReportScene(Farm chosenFarm) {
+	public BarChart getBarChartForFarmReportScene(Farm chosenFarm, Stage arg0) {
 		// Bar Chart
 		CategoryAxis xAxis = new CategoryAxis();
 		xAxis.setLabel("");
@@ -445,11 +457,24 @@ public class Main extends Application {
 		// Making the bar chart from info from FarmReport
 		FarmReport farmReport = new FarmReport(chosenFarm, 2019);
 		farmReport.runReport();
-		System.out.println(farmReport.min + "   " + farmReport.average + "     " + farmReport.max);
 		dataSeries1.getData().add(new XYChart.Data("Min", farmReport.min));
 		dataSeries1.getData().add(new XYChart.Data("Average", farmReport.average));
 		dataSeries1.getData().add(new XYChart.Data("Max", farmReport.max));
 		barChart.getData().add(dataSeries1);
+
+		saveFileFarmReport.setOnAction(e -> {
+			try {
+				csv.writeToAFile("Farm Report", farmReport.min, farmReport.max, farmReport.average,
+						farmReport.percents, farmReport.percentLabels);
+				System.out.println(farmReport.min + " " + farmReport.max + " " + farmReport.average
+						+ " " + farmReport.percents + " " + farmReport.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
+
 		return barChart;
 	}
 
@@ -482,8 +507,27 @@ public class Main extends Application {
 
 		VBox thirdBox = new VBox();
 
+		HBox goBackAndSave = new HBox();
+		goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileAnnualReport);
+
 		// Makes the third scene
-		thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBack(arg0));
+		thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBackAndSave);
+
+		saveFileAnnualReport.setOnAction(e -> {
+			AnnualReport annualReportSave = new AnnualReport(hashMap, new Year(2019));
+			annualReportSave.runReport();
+			try {
+				csv.writeToAFile("Annual Report", annualReportSave.min, annualReportSave.max,
+						annualReportSave.average, annualReportSave.percents,
+						annualReportSave.percentLabels);
+				System.out.println(annualReportSave.min + " " + annualReportSave.max + " " + annualReportSave.average
+						+ " " + annualReportSave.percents + " " + annualReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
 
 		// Return the third scene
 		annualReportScene = new Scene(thirdBox, 1000, 1500);
@@ -627,12 +671,30 @@ public class Main extends Application {
 		forthText.setFill(Color.BLACK);
 		forthText.setStyle("-fx-font: 20 arial;");
 
+		HBox goBackAndSave = new HBox();
+		goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileMonthlyReport);
+
 		HBox hbox = new HBox();
-		hbox.getChildren().addAll(tableSpace, goBack(arg0));
+		hbox.getChildren().addAll(tableSpace, goBackAndSave);
 
 		// Makes the forthScene
 		VBox forthBox = new VBox();
 		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton, charts, hbox);
+
+		saveFileMonthlyReport.setOnAction(e -> {
+			MonthlyReport monthlyReportSave = new MonthlyReport(hashMap, new Year(2019),
+					getMonthNum(chosenMonth));
+			monthlyReportSave.runReport();
+			try {
+				csv.writeToAFile("Monthly Report", monthlyReportSave.min, monthlyReportSave.max,
+						monthlyReportSave.average, monthlyReportSave.percents,
+						monthlyReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
 
 		// Return second scene
 		monthlyReportScene = new Scene(forthBox, 1000, 1000);
@@ -806,6 +868,7 @@ public class Main extends Application {
 		Label secondDateLabel = new Label(secondDate);
 		HBox firstToSecondDate = new HBox();
 		firstToSecondDate.getChildren().addAll(dateRange, firstDateLabel, to, secondDateLabel);
+
 //		Label data = new Label("Data Range:     ");
 //		TilePane r = new TilePane();
 //		TilePane r2 = new TilePane();
@@ -823,10 +886,32 @@ public class Main extends Application {
 //		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2,
 //				submitDateForDataRangeReport);
 
+		HBox goBackAndSave = new HBox();
+		goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileDataRangeReport);
+
+		Label spaceBetweenTableAndText = new Label();
+		Label note = new Label(
+				"NOTE: If you want to look at report of different dates, please go back and come "
+						+ "back to data range report to pick different dates.");
 		// Go back to choices
 		VBox fifthBox = new VBox();
 		fifthBox.getChildren().addAll(fifthText, firstToSecondDate,
-				getTableForDataRangeReportScene(date1, date2), goBack(arg0));
+				getTableForDataRangeReportScene(date1, date2), goBackAndSave,
+				spaceBetweenTableAndText, note);
+
+		saveFileDataRangeReport.setOnAction(e -> {
+			DateRangeReport dateRangeReportSave = new DateRangeReport(hashMap, date1, date2);
+			dateRangeReportSave.runReport();
+			try {
+				csv.writeToAFile("Data Range Report", dateRangeReportSave.min,
+						dateRangeReportSave.max, dateRangeReportSave.average,
+						dateRangeReportSave.percents, dateRangeReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
 
 		// Return fifth scene
 		dataRangeReportScene = new Scene(fifthBox, 1000, 1500);
