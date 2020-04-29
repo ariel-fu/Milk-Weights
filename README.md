@@ -17,7 +17,6 @@ No.
 
 
 Other notes or comments to the grader:
-Writing to a file writes the report data to another file called reportData. 
-[place any comments or notes that will help the grader here]
+Writing to a file writes the report data to another file called reportData. In the future, we would work on implementing it for multiple years. 
 
  
