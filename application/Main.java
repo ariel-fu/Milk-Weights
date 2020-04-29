@@ -1,26 +1,19 @@
 package application;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JOptionPane;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
@@ -28,8 +21,6 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -111,8 +102,7 @@ public class Main extends Application {
 
   // hashMap full of all farms
   HashMap<String, Farm> hashMap = null;
-  // The File prompting scene
-  Scene promptFileScene = null;
+
   // The Data Range Report scene
   Scene dataRangeReportScene = null;
   // The Monthly report scene
@@ -154,6 +144,11 @@ public class Main extends Application {
   // Stores the second date picked by the user
   DatePicker secondDatePickedForDataRangeReport;
 
+  Button saveFileFarmReport = new Button("Save to the file");
+  Button saveFileAnnualReport = new Button("Save to the file");
+  Button saveFileMonthlyReport = new Button("Save to the file");
+  Button saveFileDataRangeReport = new Button("Save to the file");
+
   @Override
   public void start(Stage arg0) throws Exception {
 
@@ -172,27 +167,31 @@ public class Main extends Application {
     // A place for the user to type the file name and submit
     Button continueButton = new Button("Continue");
     TextField textField = new TextField();
-    Button submit = new Button("Submit");
+    Button button = new Button("Submit");
 
     // If the submit button pressed, then save the file name put in by the user
     // and
     // go to choiceScene method, where the choice
     // scene and all other scenes are made
-    submit.setOnAction(e -> {
+    button.setOnAction(e -> {
       fileName = textField.getText();
-      choiceScene(arg0, continueButton);
+      try {
+        choiceScene(arg0, continueButton);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
     });
 
     // All this makes the first scene
     VBox vBoxFirstScene = new VBox();
-    vBoxFirstScene.getChildren().addAll(text, lable2, textField, submit,
+    vBoxFirstScene.getChildren().addAll(text, lable2, textField, button,
         continueButton);
     vBoxFirstScene.setAlignment(Pos.CENTER);
     root.setCenter(vBoxFirstScene);
-    Scene inputScene = new Scene(root, 450, 200);
-    promptFileScene = inputScene;
+    Scene mainScene = new Scene(root, 450, 200);
     arg0.setTitle("Milk Weights");
-    arg0.setScene(inputScene);
+    arg0.setScene(mainScene);
     arg0.show();
 
   }
@@ -203,10 +202,11 @@ public class Main extends Application {
    * @param arg0        - the arg
    * @param secondScene - the second scene
    * @return the first scene, input file name
-   * 
+   * @throws IOException
    * @throws InterruptedException
    */
-  public void choiceScene(Stage arg0, Button continueButton) {
+  public void choiceScene(Stage arg0, Button continueButton)
+      throws IOException {
     // Makes the choice scene, for user to pick which data to look at
     HBox hBox = new HBox();
     hBox.getChildren().addAll(farmButton, monthButton, annualButton,
@@ -214,8 +214,7 @@ public class Main extends Application {
     VBox vBox = new VBox();
     Button close = new Button("Close");
     HBox closeAndSave = new HBox();
-    Button saveFile = new Button("Save to the file");
-    closeAndSave.getChildren().addAll(close, saveFile);
+    closeAndSave.getChildren().addAll(close);
     vBox.getChildren().addAll(new Label("Choose one: "), hBox, closeAndSave);
     choiceScene = new Scene(vBox, 500, 100);
 
@@ -223,22 +222,16 @@ public class Main extends Application {
     // main scene), then the scene changes to the choice scene
     continueButton.setOnAction(e -> arg0.setScene(choiceScene));
 
-//    // Parse the file given by user and store the farms in an array list
-    boolean invalidFile = true;
-//    // loops until the user gives us a valid file
-
     try {
       // try to parse the file
       hashMap = csv.parseFile(new FileReader(fileName));
       // break out of the loop
-      invalidFile = false;
     } catch (IOException e) {
       // show that it was an invalid message
       JOptionPane.showMessageDialog(null, "Invalid File name!");
       return;// leave
       // show an alert message to the user
     }
-
     Collection<Farm> collection = hashMap.values();
     allFarms = new ArrayList<Farm>(collection);
 
@@ -263,20 +256,19 @@ public class Main extends Application {
     monthButton.setOnAction(
         e -> arg0.setScene(getMonthlyReportScene(arg0, choiceScene)));
 
-    // Once the user picks a month in the monthly report scene and click
-    // submit,
-    // the
-    // scene will change to a similar scene but now with the bar change, pie
-    // chart,
-    // and
-    // table of the month that was picked
+    // Once the user picks a month in the monthly report scene and click submit,
+    // the scene will change to a similar scene but now with the bar change, pie
+    // chart, and table of the month that was picked
     monthReportSubmitButton.setOnAction(e -> {
-      if (getMonthNum(monthCombo.getValue()) == 1) {
+      if (getMonthNum(monthCombo.getValue()) == -1) {
+
+      } else if (getMonthNum(monthCombo.getValue()) == 1) {
         arg0.setScene(
             this.getMonthlyReportSceneAfterUserChosesAMonth(arg0, "January"));
       } else if (getMonthNum(monthCombo.getValue()) == 2) {
         arg0.setScene(
             this.getMonthlyReportSceneAfterUserChosesAMonth(arg0, "February"));
+
       } else if (getMonthNum(monthCombo.getValue()) == 3) {
         arg0.setScene(
             this.getMonthlyReportSceneAfterUserChosesAMonth(arg0, "March"));
@@ -332,44 +324,22 @@ public class Main extends Application {
     // In the choice scene, if the user clicks the close button, the program
     // stops
     close.setOnAction(e -> arg0.close());
-
-    saveFile.setOnAction(e -> arg0.setScene(getSaveFileScene(arg0)));
-  }
-
-  private Scene getSaveFileScene(Stage arg) {
-    Scene saveFileScene = null;
-    Text secondText = new Text();
-    secondText.setText("SAVED!");
-    secondText.setFill(Color.BLACK);
-    secondText.setStyle("-fx-font: 50 arial;");
-    VBox vbox = new VBox();
-    vbox.getChildren().addAll(secondText, goBack(arg));
-    vbox.setAlignment(Pos.CENTER);
-    saveFileScene = new Scene(vbox, 200, 300);
-    return saveFileScene;
-
   }
 
   // TODO: If the user types a wrong file, SHOULD WE DO SOMETHING??? I made a
   // scene for that but don't know how to use it
-  /**
-   * This scene is the scene the user will see if the file is not found.
-   * 
-   * @param arg0
-   * @return a scene that lets the user know that the file is invalid.
-   */
-  public Scene getFileNotFoundScene(Stage arg0) {
-    Text secondText = new Text();
-    secondText.setText(
-        "File: " + fileName + " not found. Please input a valid file name.");
-    secondText.setFill(Color.BLACK);
-    secondText.setStyle("-fx-font: 30 arial;");
-    HBox hBox = new HBox();
-    hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
-    hBox.setAlignment(Pos.CENTER);
-    Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
-    return fileNotFoundScene;
-  }
+//	public Scene fileNotFoundScene(Stage arg0) {
+//		Text secondText = new Text();
+//		secondText.setText("File: " + fileName
+//				+ " not found. Please go back and change your stupid file name!");
+//		secondText.setFill(Color.BLACK);
+//		secondText.setStyle("-fx-font: 30 arial;");
+//		HBox hBox = new HBox();
+//		hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
+//		hBox.setAlignment(Pos.CENTER);
+//		Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
+//		return fileNotFoundScene;
+//	}
 
   /**
    * Returns the farm report scene.
@@ -425,8 +395,8 @@ public class Main extends Application {
     PieChart chart = this.getPieChartForFarmReport(chosenFarm);
     chart.setTitle("Month Percentage");
     HBox charts = new HBox();
-    charts.getChildren().addAll(this.getBarChartForFarmReportScene(chosenFarm),
-        chart);
+    charts.getChildren()
+        .addAll(this.getBarChartForFarmReportScene(chosenFarm, arg0), chart);
 
     Text secondText = new Text();
     secondText.setText("Farm Report");
@@ -441,15 +411,39 @@ public class Main extends Application {
     hBoxSpace.getChildren().addAll(space);
     HBox hBoxAll = new HBox();
     hBoxAll.getChildren().addAll(farm, farmCombo, year, hBoxSpace);
-    Button saveFile = new Button("Save to the file");
+
+    HBox goBackAndSave = new HBox();
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileFarmReport);
+
     // Go back to choices
     VBox secondVBox = new VBox();
     secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton,
-        saveFile, charts, goBack(arg0));
+        charts, goBackAndSave);
 
     // Return second scene
     farmReportScene = new Scene(secondVBox, 1000, 1500);
     return farmReportScene;
+  }
+
+  /**
+   * Scene that lets the user know the file is saved and saved the file given by
+   * the user.
+   * 
+   * @param arg -arg
+   * @return the scene that says "Saved!"
+   */
+  private Scene getSaveFileScene(Stage arg) {
+    Scene saveFileScene = null;
+    Text secondText = new Text();
+    secondText.setText("SAVED!");
+    secondText.setFill(Color.BLACK);
+    secondText.setStyle("-fx-font: 50 arial;");
+    VBox vbox = new VBox();
+    vbox.getChildren().addAll(secondText, goBack(arg));
+    vbox.setAlignment(Pos.CENTER);
+    saveFileScene = new Scene(vbox, 200, 300);
+    return saveFileScene;
+
   }
 
   /**
@@ -485,7 +479,7 @@ public class Main extends Application {
    * @param chosenFarm - the farm chosen by the user
    * @return a bar chart for the farm report scene
    */
-  public BarChart getBarChartForFarmReportScene(Farm chosenFarm) {
+  public BarChart getBarChartForFarmReportScene(Farm chosenFarm, Stage arg0) {
     // Bar Chart
     CategoryAxis xAxis = new CategoryAxis();
     xAxis.setLabel("");
@@ -498,12 +492,25 @@ public class Main extends Application {
     // Making the bar chart from info from FarmReport
     FarmReport farmReport = new FarmReport(chosenFarm, 2019);
     farmReport.runReport();
-    System.out.println(
-        farmReport.min + "   " + farmReport.average + "     " + farmReport.max);
     dataSeries1.getData().add(new XYChart.Data("Min", farmReport.min));
     dataSeries1.getData().add(new XYChart.Data("Average", farmReport.average));
     dataSeries1.getData().add(new XYChart.Data("Max", farmReport.max));
     barChart.getData().add(dataSeries1);
+
+    saveFileFarmReport.setOnAction(e -> {
+      try {
+        csv.writeToAFile("Farm Report", farmReport.min, farmReport.max,
+            farmReport.average, farmReport.percents, farmReport.percentLabels);
+        System.out.println(
+            farmReport.min + " " + farmReport.max + " " + farmReport.average
+                + " " + farmReport.percents + " " + farmReport.percentLabels);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      arg0.setScene(getSaveFileScene(arg0));
+    });
+
     return barChart;
   }
 
@@ -536,8 +543,28 @@ public class Main extends Application {
 
     VBox thirdBox = new VBox();
 
+    HBox goBackAndSave = new HBox();
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileAnnualReport);
+
     // Makes the third scene
-    thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBack(arg0));
+    thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBackAndSave);
+
+    saveFileAnnualReport.setOnAction(e -> {
+      AnnualReport annualReportSave = new AnnualReport(hashMap, new Year(2019));
+      annualReportSave.runReport();
+      try {
+        csv.writeToAFile("Annual Report", annualReportSave.min,
+            annualReportSave.max, annualReportSave.average,
+            annualReportSave.percents, annualReportSave.percentLabels);
+        System.out.println(annualReportSave.min + " " + annualReportSave.max
+            + " " + annualReportSave.average + " " + annualReportSave.percents
+            + " " + annualReportSave.percentLabels);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      arg0.setScene(getSaveFileScene(arg0));
+    });
 
     // Return the third scene
     annualReportScene = new Scene(thirdBox, 1000, 1500);
@@ -693,13 +720,32 @@ public class Main extends Application {
     forthText.setFill(Color.BLACK);
     forthText.setStyle("-fx-font: 20 arial;");
 
+    HBox goBackAndSave = new HBox();
+    goBackAndSave.getChildren().addAll(goBack(arg0),
+        this.saveFileMonthlyReport);
+
     HBox hbox = new HBox();
-    hbox.getChildren().addAll(tableSpace, goBack(arg0));
+    hbox.getChildren().addAll(tableSpace, goBackAndSave);
 
     // Makes the forthScene
     VBox forthBox = new VBox();
     forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton,
         charts, hbox);
+
+    saveFileMonthlyReport.setOnAction(e -> {
+      MonthlyReport monthlyReportSave = new MonthlyReport(hashMap,
+          new Year(2019), getMonthNum(chosenMonth));
+      monthlyReportSave.runReport();
+      try {
+        csv.writeToAFile("Monthly Report", monthlyReportSave.min,
+            monthlyReportSave.max, monthlyReportSave.average,
+            monthlyReportSave.percents, monthlyReportSave.percentLabels);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      arg0.setScene(getSaveFileScene(arg0));
+    });
 
     // Return second scene
     monthlyReportScene = new Scene(forthBox, 1000, 1000);
@@ -883,6 +929,7 @@ public class Main extends Application {
     HBox firstToSecondDate = new HBox();
     firstToSecondDate.getChildren().addAll(dateRange, firstDateLabel, to,
         secondDateLabel);
+
 //		Label data = new Label("Data Range:     ");
 //		TilePane r = new TilePane();
 //		TilePane r2 = new TilePane();
@@ -900,10 +947,34 @@ public class Main extends Application {
 //		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2,
 //				submitDateForDataRangeReport);
 
+    HBox goBackAndSave = new HBox();
+    goBackAndSave.getChildren().addAll(goBack(arg0),
+        this.saveFileDataRangeReport);
+
+    Label spaceBetweenTableAndText = new Label();
+    Label note = new Label(
+        "NOTE: If you want to look at report of different dates, please go back and come "
+            + "back to data range report to pick different dates.");
     // Go back to choices
     VBox fifthBox = new VBox();
     fifthBox.getChildren().addAll(fifthText, firstToSecondDate,
-        getTableForDataRangeReportScene(date1, date2), goBack(arg0));
+        getTableForDataRangeReportScene(date1, date2), goBackAndSave,
+        spaceBetweenTableAndText, note);
+
+    saveFileDataRangeReport.setOnAction(e -> {
+      DateRangeReport dateRangeReportSave = new DateRangeReport(hashMap, date1,
+          date2);
+
+      dateRangeReportSave.runReport();
+      try {
+        csv.writeToAFile("Data Range Report", dateRangeReportSave.min,
+            dateRangeReportSave.max, dateRangeReportSave.average,
+            dateRangeReportSave.percents, dateRangeReportSave.percentLabels);
+      } catch (IOException e1) {
+        // won't happen bc we create a file and write to it
+      }
+      arg0.setScene(getSaveFileScene(arg0));
+    });
 
     // Return fifth scene
     dataRangeReportScene = new Scene(fifthBox, 1000, 1500);
@@ -989,6 +1060,13 @@ public class Main extends Application {
    * @return the number associated with the month
    */
   public int getMonthNum(String chosenMonth) {
+    // if the month is null (user did not choose a month first), display an
+    // error message and return -1;
+    if (chosenMonth == null) {
+      JOptionPane.showMessageDialog(null, "Choose a month first!");
+      return -1;
+    }
+    // otherwise, find the month
     if (chosenMonth.contentEquals("January")) {
       return 1;
     } else if (chosenMonth.contentEquals("February")) {
