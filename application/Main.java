@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.swing.JOptionPane;
-
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -51,7 +49,7 @@ public class Main extends Application {
    * @author prasunguragain
    *
    */
-  public class TableInner {
+  private class TableInner {
     // Farm name
     private final SimpleStringProperty name;
 
@@ -68,86 +66,68 @@ public class Main extends Application {
      * @param percent  - total percentage of weight for a farm
      * @param weight   - total weight for a farm
      */
-    public TableInner(String farmName, String percent, String weight) {
+    private TableInner(String farmName, String percent, String weight) {
       this.name = new SimpleStringProperty(farmName);
       this.percent = new SimpleStringProperty(percent);
       this.weight = new SimpleStringProperty(weight);
-    }
-
-    // Gets the farm name
-    public String getName() {
-      return name.get();
-    }
-
-    // Gets the total percentage of weight for a farm
-    public String getPercent() {
-      return percent.get();
-    }
-
-    // Gets the total weight for a farm
-    public String getWeight() {
-      return weight.get();
     }
   }
 
   // Scene
   // The scene with the choices
-  Scene choiceScene;
+  private Scene choiceScene;
 
   // The CSVFile object
-  CSVFile csv = new CSVFile();
+  private CSVFile csv = new CSVFile();
 
   // The file name given by the user
-  String fileName = "";
+  private String fileName = "";
 
   // hashMap full of all farms
-  HashMap<String, Farm> hashMap = null;
+  private HashMap<String, Farm> hashMap = null;
 
   // The Data Range Report scene
-  Scene dataRangeReportScene = null;
+  private Scene dataRangeReportScene = null;
   // The Monthly report scene
-  Scene monthlyReportScene = null;
+  private Scene monthlyReportScene = null;
   // The Annual Report scene
-  Scene annualReportScene = null;
+  private Scene annualReportScene = null;
   // The farm report scene
-  Scene farmReportScene = null;
+  private Scene farmReportScene = null;
 
   // Buttons that will be used to change to a specified scene chosen by the user
-  Button farmButton = new Button("Farm Report");
-  Button monthButton = new Button("Month Report");
-  Button annualButton = new Button("Annual Report");
-  Button dataRangeButton = new Button("Data Range Report");
+  private Button farmButton = new Button("Farm Report");
+  private Button monthButton = new Button("Month Report");
+  private Button annualButton = new Button("Annual Report");
+  private Button dataRangeButton = new Button("Data Range Report");
 
   // Array list of all farms
   private ArrayList<Farm> allFarms = new ArrayList<Farm>();
 
   // Combo box of all farms, user chooses which farm they want to look at
-  ComboBox<String> farmCombo = new ComboBox<String>(
+  private ComboBox<String> farmCombo = new ComboBox<String>(
       FXCollections.observableArrayList());
-  Button farmReportSubmitButton = new Button("Submit and show");
+  private Button farmReportSubmitButton = new Button("Submit and show");
 
   // Combo box of all months, user chooses which month to look at
-  ComboBox<String> monthCombo = new ComboBox<String>(
+  private ComboBox<String> monthCombo = new ComboBox<String>(
       FXCollections.observableArrayList());
-  Button monthReportSubmitButton = new Button("Submit and show");
+  private Button monthReportSubmitButton = new Button("Submit and show");
 
   // Array list of months
-  ArrayList<String> months;
+  private ArrayList<String> months;
 
   // Once the user types 2 dates in the data range report scene, they have to
   // click this button to show the result
-  Button submitDateForDataRangeReport = new Button("Submit Date");
+  private Button submitDateForDataRangeReport = new Button("Submit Date");
 
   // Stores the first date picked by the user
-  DatePicker firstDatePickedForDataRangeReport;
+  private DatePicker firstDatePickedForDataRangeReport;
 
   // Stores the second date picked by the user
-  DatePicker secondDatePickedForDataRangeReport;
+  private DatePicker secondDatePickedForDataRangeReport;
 
-  Button saveFileFarmReport = new Button("Save to the file");
-  Button saveFileAnnualReport = new Button("Save to the file");
-  Button saveFileMonthlyReport = new Button("Save to the file");
-  Button saveFileDataRangeReport = new Button("Save to the file");
+  private Button saveReport = new Button("Save to the file");
 
   @Override
   public void start(Stage arg0) throws Exception {
@@ -205,7 +185,7 @@ public class Main extends Application {
    * @throws IOException
    * @throws InterruptedException
    */
-  public void choiceScene(Stage arg0, Button continueButton)
+  private void choiceScene(Stage arg0, Button continueButton)
       throws IOException {
     // Makes the choice scene, for user to pick which data to look at
     HBox hBox = new HBox();
@@ -326,21 +306,6 @@ public class Main extends Application {
     close.setOnAction(e -> arg0.close());
   }
 
-  // TODO: If the user types a wrong file, SHOULD WE DO SOMETHING??? I made a
-  // scene for that but don't know how to use it
-//	public Scene fileNotFoundScene(Stage arg0) {
-//		Text secondText = new Text();
-//		secondText.setText("File: " + fileName
-//				+ " not found. Please go back and change your stupid file name!");
-//		secondText.setFill(Color.BLACK);
-//		secondText.setStyle("-fx-font: 30 arial;");
-//		HBox hBox = new HBox();
-//		hBox.getChildren().addAll(secondText, new Label("     "), goBack(arg0));
-//		hBox.setAlignment(Pos.CENTER);
-//		Scene fileNotFoundScene = new Scene(hBox, 1000, 300);
-//		return fileNotFoundScene;
-//	}
-
   /**
    * Returns the farm report scene.
    * 
@@ -348,7 +313,7 @@ public class Main extends Application {
    * @param choice - scene of choices
    * @return the second scene, farm report
    */
-  public Scene getFarmReportScene(Stage arg0) {
+  private Scene getFarmReportScene(Stage arg0) {
     // SECOND SCENE
 
     ArrayList<String> id = new ArrayList<String>();
@@ -372,10 +337,17 @@ public class Main extends Application {
     HBox hBoxAll = new HBox();
     hBoxAll.getChildren().addAll(farm, farmCombo, year);
 
+    Label spaceBeforeNotes = new Label("     ");
+    Label notes = new Label(
+        "NOTE: Please choose a farm using the drop down, then click submit to see the "
+            + "report.");
+    VBox spaceAndNotes = new VBox();
+    spaceAndNotes.getChildren().addAll(spaceBeforeNotes, notes);
+
     // Go back to choices
     VBox secondVBox = new VBox();
     secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton,
-        goBack(arg0));
+        goBack(arg0), spaceAndNotes);
 
     // Return second scene
     farmReportScene = new Scene(secondVBox, 1000, 1500);
@@ -389,7 +361,7 @@ public class Main extends Application {
    * @param chosenFarm - the farm chosen by the user
    * @return the farm report scene with bar chart and pie chart
    */
-  public Scene getFarmReportSceneAfterUserChosesAFarm(Stage arg0,
+  private Scene getFarmReportSceneAfterUserChosesAFarm(Stage arg0,
       Farm chosenFarm) {
     // Pie Chart
     PieChart chart = this.getPieChartForFarmReport(chosenFarm);
@@ -413,12 +385,21 @@ public class Main extends Application {
     hBoxAll.getChildren().addAll(farm, farmCombo, year, hBoxSpace);
 
     HBox goBackAndSave = new HBox();
-    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileFarmReport);
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveReport);
+
+    Label spaceBeforeNotes = new Label("     ");
+    Label notes = new Label(
+        "NOTE: If you want to look at another farm, please use the drop down again to "
+            + "select another farm. You can click the Go Back button to go back and "
+            + "look at more reports. \nIf you would like to save this info to look back "
+            + "later in reportData file, you can click the Save to the file button.");
+    VBox spaceAndNotes = new VBox();
+    spaceAndNotes.getChildren().addAll(spaceBeforeNotes, notes);
 
     // Go back to choices
     VBox secondVBox = new VBox();
     secondVBox.getChildren().addAll(secondText, hBoxAll, farmReportSubmitButton,
-        charts, goBackAndSave);
+        charts, goBackAndSave, spaceAndNotes);
 
     // Return second scene
     farmReportScene = new Scene(secondVBox, 1000, 1500);
@@ -452,7 +433,7 @@ public class Main extends Application {
    * @param chosenFarm - the month chosen by the user
    * @return the pie chart for the farm report scene
    */
-  public PieChart getPieChartForFarmReport(Farm chosenFarm) {
+  private PieChart getPieChartForFarmReport(Farm chosenFarm) {
     FarmReport farmReport = new FarmReport(chosenFarm, 2019);
     farmReport.runReport();
     List<Double> percentage = farmReport.getPercents();
@@ -479,7 +460,7 @@ public class Main extends Application {
    * @param chosenFarm - the farm chosen by the user
    * @return a bar chart for the farm report scene
    */
-  public BarChart getBarChartForFarmReportScene(Farm chosenFarm, Stage arg0) {
+  private BarChart getBarChartForFarmReportScene(Farm chosenFarm, Stage arg0) {
     // Bar Chart
     CategoryAxis xAxis = new CategoryAxis();
     xAxis.setLabel("");
@@ -497,7 +478,7 @@ public class Main extends Application {
     dataSeries1.getData().add(new XYChart.Data("Max", farmReport.max));
     barChart.getData().add(dataSeries1);
 
-    saveFileFarmReport.setOnAction(e -> {
+    saveReport.setOnAction(e -> {
       try {
         csv.writeToAFile("Farm Report", farmReport.min, farmReport.max,
             farmReport.average, farmReport.percents, farmReport.percentLabels);
@@ -521,7 +502,7 @@ public class Main extends Application {
    * @param choice - scene with choices
    * @return annual report scene
    */
-  public Scene getAnnualReportScene(Stage arg0, Scene choice) {
+  private Scene getAnnualReportScene(Stage arg0, Scene choice) {
     // Scene thirdScene;
     Text thirdText = new Text();
     thirdText.setText("Annual Report");
@@ -544,12 +525,20 @@ public class Main extends Application {
     VBox thirdBox = new VBox();
 
     HBox goBackAndSave = new HBox();
-    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveFileAnnualReport);
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveReport);
+
+    Label spaceBeforeNotes = new Label("     ");
+    Label notes = new Label(
+        "NOTE: If you would like to look at different reports, please click the Go Back "
+            + "button.");
+    VBox spaceAndNotes = new VBox();
+    spaceAndNotes.getChildren().addAll(spaceBeforeNotes, notes);
 
     // Makes the third scene
-    thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBackAndSave);
+    thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBackAndSave,
+        spaceAndNotes);
 
-    saveFileAnnualReport.setOnAction(e -> {
+    saveReport.setOnAction(e -> {
       AnnualReport annualReportSave = new AnnualReport(hashMap, new Year(2019));
       annualReportSave.runReport();
       try {
@@ -576,7 +565,7 @@ public class Main extends Application {
    * 
    * @return the pie chart for the annual report scene
    */
-  public PieChart getPieChartForAnnualReportScene() {
+  private PieChart getPieChartForAnnualReportScene() {
     int num = allFarms.size();
     PieChart.Data pieChart = null;
     ArrayList<PieChart.Data> listOfData = new ArrayList<PieChart.Data>();
@@ -601,7 +590,7 @@ public class Main extends Application {
    * 
    * @return a table for the annual report scene
    */
-  public VBox getTableForAnnualReportScene() {
+  private VBox getTableForAnnualReportScene() {
     // Table for farm, percentage, and weight
     final TableView<TableInner> table = new TableView<>();
     table.setItems(getListForTableForAnnualReportScene());
@@ -652,7 +641,7 @@ public class Main extends Application {
    * @param choice - scene with choices
    * @return monthly report scene
    */
-  public Scene getMonthlyReportScene(Stage arg0, Scene choice) {
+  private Scene getMonthlyReportScene(Stage arg0, Scene choice) {
     // Scene forthScene;
 
     // ComboBox
@@ -680,10 +669,17 @@ public class Main extends Application {
     forthText.setFill(Color.BLACK);
     forthText.setStyle("-fx-font: 20 arial;");
 
+    Label spaceBeforeNotes = new Label("     ");
+    Label notes = new Label(
+        "NOTE: Please use the drop down to select a month. then click submit to see the "
+            + "report.");
+    VBox spaceAndNotes = new VBox();
+    spaceAndNotes.getChildren().addAll(spaceBeforeNotes, notes);
+
     // Makes the forthScene
     VBox forthBox = new VBox();
     forthBox.getChildren().addAll(forthText, monthCombo,
-        monthReportSubmitButton, goBack(arg0));
+        monthReportSubmitButton, goBack(arg0), spaceAndNotes);
 
     // Return second scene
     monthlyReportScene = new Scene(forthBox, 1000, 1000);
@@ -697,11 +693,18 @@ public class Main extends Application {
    * @param chosenMonth - chosenMonth
    * @return
    */
-  public Scene getMonthlyReportSceneAfterUserChosesAMonth(Stage arg0,
+  private Scene getMonthlyReportSceneAfterUserChosesAMonth(Stage arg0,
       String chosenMonth) {
     // ComboBox
     Label monthLabel = new Label("Month     ");
     HBox hBox = new HBox();
+    Label notes = new Label(
+        "NOTE: If you want to look at another month, use the drop down again. "
+            + "Click the Go Back button to go back and "
+            + "look at more reports. If you would like to save this info to look "
+            + "back later in reportData file, click the Save to the file "
+            + "button.");
+
     hBox.getChildren().addAll(monthLabel, monthCombo);
 
     PieChart pieChart2 = getPieChartForMonthlyReportScene(chosenMonth);
@@ -721,8 +724,7 @@ public class Main extends Application {
     forthText.setStyle("-fx-font: 20 arial;");
 
     HBox goBackAndSave = new HBox();
-    goBackAndSave.getChildren().addAll(goBack(arg0),
-        this.saveFileMonthlyReport);
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveReport);
 
     HBox hbox = new HBox();
     hbox.getChildren().addAll(tableSpace, goBackAndSave);
@@ -730,9 +732,9 @@ public class Main extends Application {
     // Makes the forthScene
     VBox forthBox = new VBox();
     forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton,
-        charts, hbox);
+        notes, charts, hbox);
 
-    saveFileMonthlyReport.setOnAction(e -> {
+    saveReport.setOnAction(e -> {
       MonthlyReport monthlyReportSave = new MonthlyReport(hashMap,
           new Year(2019), getMonthNum(chosenMonth));
       monthlyReportSave.runReport();
@@ -748,7 +750,7 @@ public class Main extends Application {
     });
 
     // Return second scene
-    monthlyReportScene = new Scene(forthBox, 1000, 1000);
+    monthlyReportScene = new Scene(forthBox, 1500, 1500);
     return monthlyReportScene;
   }
 
@@ -759,7 +761,7 @@ public class Main extends Application {
    * @param chosenMonth - the most chosen by the user
    * @return a bar chart
    */
-  public BarChart getBarChartForMonthReportScene(String chosenMonth) {
+  private BarChart getBarChartForMonthReportScene(String chosenMonth) {
     CategoryAxis xAxis = new CategoryAxis();
     xAxis.setLabel("");
     NumberAxis yAxis = new NumberAxis();
@@ -787,7 +789,7 @@ public class Main extends Application {
    * @param chosenMonth - the month chosen by the user
    * @return a pie chart
    */
-  public PieChart getPieChartForMonthlyReportScene(String chosenMonth) {
+  private PieChart getPieChartForMonthlyReportScene(String chosenMonth) {
     int num = allFarms.size();
     ArrayList<String> listOfData = new ArrayList<String>();
     ArrayList<Double> listOfData2 = new ArrayList<Double>();
@@ -817,7 +819,7 @@ public class Main extends Application {
    * @param chosenMonth - the month chosen by the user
    * @return the table
    */
-  public VBox getTableForMonthlyReportScene(String chosenMonth) {
+  private VBox getTableForMonthlyReportScene(String chosenMonth) {
     // Table for farm, percentage, and weight
     final TableView<TableInner> table = new TableView<>();
     table.setItems(getListForTableForMonthlyReportScene(chosenMonth));
@@ -870,7 +872,7 @@ public class Main extends Application {
    * @param choice - the scene with choices
    * @return data Range Report scene
    */
-  public Scene getDataRangeReportScene(Stage arg0, Scene choice) {
+  private Scene getDataRangeReportScene(Stage arg0, Scene choice) {
     // Scene dataRangeReportScene;
     Text fifthText = new Text();
     fifthText.setText("Data Range Report");
@@ -912,7 +914,7 @@ public class Main extends Application {
    * @param date2 - second date picked by the user
    * @return the data range report scene with table
    */
-  public Scene getDataRangeReportSceneAfterPickingDate(Stage arg0,
+  private Scene getDataRangeReportSceneAfterPickingDate(Stage arg0,
       LocalDate date1, LocalDate date2) {
     Text fifthText = new Text();
     fifthText.setText("Data Range Report");
@@ -930,38 +932,23 @@ public class Main extends Application {
     firstToSecondDate.getChildren().addAll(dateRange, firstDateLabel, to,
         secondDateLabel);
 
-//		Label data = new Label("Data Range:     ");
-//		TilePane r = new TilePane();
-//		TilePane r2 = new TilePane();
-//		DatePicker d = new DatePicker();
-//		DatePicker d2 = new DatePicker();
-//		r.getChildren().add(d);
-//		r2.getChildren().add(d2);
-//		HBox hBoxAll = new HBox();
-//		HBox hBoxAll2 = new HBox();
-//		VBox calendar = new VBox();
-//		hBoxAll.getChildren().addAll(r);
-//		hBoxAll2.getChildren().addAll(r2);
-//		Label space = new Label("     ");
-//		Label space2 = new Label("     ");
-//		calendar.getChildren().addAll(data, hBoxAll, space, hBoxAll2, space2,
-//				submitDateForDataRangeReport);
-
     HBox goBackAndSave = new HBox();
-    goBackAndSave.getChildren().addAll(goBack(arg0),
-        this.saveFileDataRangeReport);
+    goBackAndSave.getChildren().addAll(goBack(arg0), this.saveReport);
 
     Label spaceBetweenTableAndText = new Label();
     Label note = new Label(
         "NOTE: If you want to look at report of different dates, please go back and come "
-            + "back to data range report to pick different dates.");
+            + "back to data range report to pick different dates. \nIf you would like "
+            + "to " + "save this info to look "
+            + "back later in reportData file, click the Save "
+            + "to the file button.");
     // Go back to choices
     VBox fifthBox = new VBox();
     fifthBox.getChildren().addAll(fifthText, firstToSecondDate,
         getTableForDataRangeReportScene(date1, date2), goBackAndSave,
         spaceBetweenTableAndText, note);
 
-    saveFileDataRangeReport.setOnAction(e -> {
+    saveReport.setOnAction(e -> {
       DateRangeReport dateRangeReportSave = new DateRangeReport(hashMap, date1,
           date2);
 
@@ -988,7 +975,7 @@ public class Main extends Application {
    * @param date2 - second date picked by user
    * @return a table for the data range report scene
    */
-  public VBox getTableForDataRangeReportScene(LocalDate date1,
+  private VBox getTableForDataRangeReportScene(LocalDate date1,
       LocalDate date2) {
     // Table for farm, percentage, and weight
     final TableView<TableInner> table = new TableView<>();
@@ -1033,22 +1020,6 @@ public class Main extends Application {
       tableInner.add(new TableInner(dateRangeReport.percentLabels.get(i),
           percentDouble, weightInt));
     }
-//		int startDate = date1.getMonthValue();
-//		int endDate = date2.getMonthValue();
-//		ArrayList<Double> percentForFarm = new ArrayList<Double>();
-//		for (int i = 0; i < allFarms.size(); i++) {
-//			// TODO: i will be 0 in first loop, 0 month does not make sense, NEED TO FIX!
-//			MonthlyReport monthlyReport = new MonthlyReport(hashMap, new Year(2019), i);
-//			monthlyReport.runReport();
-//			for (int j = startDate; j < endDate + 1; j++) {
-//				percentForFarm.add(monthlyReport.getPercents().get(j));
-//			}
-//		}
-//		for (int k = 0; k < allFarms.size(); k++) {
-//			String percentDouble = Double.toString(percentForFarm.get(k));
-//			String weightInt = Double.toString(allFarms.get(k).getRangeTotal(date1, date2));
-//			tableInner.add(new TableInner(allFarms.get(k).getID(), percentDouble, weightInt));
-//		}
     return tableInner;
   }
 
@@ -1059,7 +1030,7 @@ public class Main extends Application {
    * @param chosenMonth - the month chosen by the user
    * @return the number associated with the month
    */
-  public int getMonthNum(String chosenMonth) {
+  private int getMonthNum(String chosenMonth) {
     // if the month is null (user did not choose a month first), display an
     // error message and return -1;
     if (chosenMonth == null) {
@@ -1102,7 +1073,7 @@ public class Main extends Application {
    * @param arg0 - arg
    * @return the button that goes back to the choice scene
    */
-  public Button goBack(Stage arg0) {
+  private Button goBack(Stage arg0) {
     Button goBack = new Button("Go Back");
     goBack.setOnAction(e -> arg0.setScene(choiceScene));
     return goBack;
