@@ -503,7 +503,7 @@ public class Main extends Application {
 		chart.setTitle("Month Percentage");
 
 		HBox charts = new HBox();
-		charts.getChildren().addAll(getTableForAnnualReportScene(), chart);
+		charts.getChildren().addAll(getTableForAnnualReportScene(arg0), chart);
 
 		VBox thirdBox = new VBox();
 
@@ -512,22 +512,6 @@ public class Main extends Application {
 
 		// Makes the third scene
 		thirdBox.getChildren().addAll(thirdText, hBoxAll, charts, goBackAndSave);
-
-		saveFileAnnualReport.setOnAction(e -> {
-			AnnualReport annualReportSave = new AnnualReport(hashMap, new Year(2019));
-			annualReportSave.runReport();
-			try {
-				csv.writeToAFile("Annual Report", annualReportSave.min, annualReportSave.max,
-						annualReportSave.average, annualReportSave.percents,
-						annualReportSave.percentLabels);
-				System.out.println(annualReportSave.min + " " + annualReportSave.max + " " + annualReportSave.average
-						+ " " + annualReportSave.percents + " " + annualReportSave.percentLabels);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			arg0.setScene(getSaveFileScene(arg0));
-		});
 
 		// Return the third scene
 		annualReportScene = new Scene(thirdBox, 1000, 1500);
@@ -563,10 +547,10 @@ public class Main extends Application {
 	 * 
 	 * @return a table for the annual report scene
 	 */
-	public VBox getTableForAnnualReportScene() {
+	public VBox getTableForAnnualReportScene(Stage arg0) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
-		table.setItems(getListForTableForAnnualReportScene());
+		table.setItems(getListForTableForAnnualReportScene(arg0));
 		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
 		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
 		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
@@ -588,7 +572,7 @@ public class Main extends Application {
 	 * 
 	 * @return a list of info to put on the table.
 	 */
-	private ObservableList<TableInner> getListForTableForAnnualReportScene() {
+	private ObservableList<TableInner> getListForTableForAnnualReportScene(Stage arg0) {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		for (int i = 0; i < allFarms.size(); i++) {
 			double percentForYear = 0.0;
@@ -599,6 +583,22 @@ public class Main extends Application {
 			String weightInt = Double.toString(allFarms.get(i).getYearTotal(2019));
 			tableInner.add(new TableInner(allFarms.get(i).getID(), percentDouble, weightInt));
 		}
+		saveFileAnnualReport.setOnAction(e -> {
+			try {
+				AnnualReport annualReportSave = new AnnualReport(hashMap, new Year(2019));
+				annualReportSave.runReport();
+				csv.writeToAFile("Annual Report", annualReportSave.min, annualReportSave.max,
+						annualReportSave.average, annualReportSave.percents,
+						annualReportSave.percentLabels);
+				System.out.println(annualReportSave.min + " " + annualReportSave.max + " "
+						+ annualReportSave.average + " " + annualReportSave.percents + " "
+						+ annualReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
 		return tableInner;
 	}
 
@@ -658,7 +658,7 @@ public class Main extends Application {
 		HBox hBox = new HBox();
 		hBox.getChildren().addAll(monthLabel, monthCombo);
 
-		PieChart pieChart2 = getPieChartForMonthlyReportScene(chosenMonth);
+		PieChart pieChart2 = getPieChartForMonthlyReportScene(chosenMonth, arg0);
 		pieChart2.setTitle("Monthly Percentage");
 		HBox charts = new HBox();
 		charts.getChildren().addAll(getBarChartForMonthReportScene(chosenMonth), pieChart2);
@@ -680,21 +680,6 @@ public class Main extends Application {
 		// Makes the forthScene
 		VBox forthBox = new VBox();
 		forthBox.getChildren().addAll(forthText, hBox, monthReportSubmitButton, charts, hbox);
-
-		saveFileMonthlyReport.setOnAction(e -> {
-			MonthlyReport monthlyReportSave = new MonthlyReport(hashMap, new Year(2019),
-					getMonthNum(chosenMonth));
-			monthlyReportSave.runReport();
-			try {
-				csv.writeToAFile("Monthly Report", monthlyReportSave.min, monthlyReportSave.max,
-						monthlyReportSave.average, monthlyReportSave.percents,
-						monthlyReportSave.percentLabels);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			arg0.setScene(getSaveFileScene(arg0));
-		});
 
 		// Return second scene
 		monthlyReportScene = new Scene(forthBox, 1000, 1000);
@@ -735,7 +720,7 @@ public class Main extends Application {
 	 * @param chosenMonth - the month chosen by the user
 	 * @return a pie chart
 	 */
-	public PieChart getPieChartForMonthlyReportScene(String chosenMonth) {
+	public PieChart getPieChartForMonthlyReportScene(String chosenMonth, Stage arg0) {
 		int num = allFarms.size();
 		ArrayList<String> listOfData = new ArrayList<String>();
 		ArrayList<Double> listOfData2 = new ArrayList<Double>();
@@ -754,6 +739,23 @@ public class Main extends Application {
 		}
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(finalArray);
 		PieChart chart = new PieChart(pieChartData);
+		
+		saveFileMonthlyReport.setOnAction(e -> {
+			MonthlyReport monthlyReportSave = new MonthlyReport(hashMap, new Year(2019),
+					getMonthNum(chosenMonth));
+			monthlyReportSave.runReport();
+			try {
+				csv.writeToAFile("Monthly Report", monthlyReportSave.min, monthlyReportSave.max,
+						monthlyReportSave.average, monthlyReportSave.percents,
+						monthlyReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+			
+		});
+		
 		return chart;
 	}
 
@@ -896,22 +898,8 @@ public class Main extends Application {
 		// Go back to choices
 		VBox fifthBox = new VBox();
 		fifthBox.getChildren().addAll(fifthText, firstToSecondDate,
-				getTableForDataRangeReportScene(date1, date2), goBackAndSave,
+				getTableForDataRangeReportScene(date1, date2, arg0), goBackAndSave,
 				spaceBetweenTableAndText, note);
-
-		saveFileDataRangeReport.setOnAction(e -> {
-			DateRangeReport dateRangeReportSave = new DateRangeReport(hashMap, date1, date2);
-			dateRangeReportSave.runReport();
-			try {
-				csv.writeToAFile("Data Range Report", dateRangeReportSave.min,
-						dateRangeReportSave.max, dateRangeReportSave.average,
-						dateRangeReportSave.percents, dateRangeReportSave.percentLabels);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			arg0.setScene(getSaveFileScene(arg0));
-		});
 
 		// Return fifth scene
 		dataRangeReportScene = new Scene(fifthBox, 1000, 1500);
@@ -925,10 +913,10 @@ public class Main extends Application {
 	 * @param date2 - second date picked by user
 	 * @return a table for the data range report scene
 	 */
-	public VBox getTableForDataRangeReportScene(LocalDate date1, LocalDate date2) {
+	public VBox getTableForDataRangeReportScene(LocalDate date1, LocalDate date2, Stage arg0) {
 		// Table for farm, percentage, and weight
 		final TableView<TableInner> table = new TableView<>();
-		table.setItems(getListForTableDataRangeReportScene(date1, date2));
+		table.setItems(getListForTableDataRangeReportScene(date1, date2, arg0));
 		TableColumn<TableInner, String> farmTable = new TableColumn<>("Farm");
 		TableColumn<TableInner, String> percent = new TableColumn<>("Total percentage");
 		TableColumn<TableInner, String> totle = new TableColumn<>("Total Weight");
@@ -953,7 +941,7 @@ public class Main extends Application {
 	 * @return a list of info to put in the table
 	 */
 	private ObservableList<TableInner> getListForTableDataRangeReportScene(LocalDate date1,
-			LocalDate date2) {
+			LocalDate date2, Stage arg0) {
 		ObservableList<TableInner> tableInner = FXCollections.observableArrayList();
 		DateRangeReport dateRangeReport = new DateRangeReport(hashMap, date1, date2);
 		dateRangeReport.runReport();
@@ -979,6 +967,21 @@ public class Main extends Application {
 //			String weightInt = Double.toString(allFarms.get(k).getRangeTotal(date1, date2));
 //			tableInner.add(new TableInner(allFarms.get(k).getID(), percentDouble, weightInt));
 //		}
+		
+		saveFileDataRangeReport.setOnAction(e -> {
+			DateRangeReport dateRangeReportSave = new DateRangeReport(hashMap, date1, date2);
+			dateRangeReportSave.runReport();
+			try {
+				csv.writeToAFile("Data Range Report", dateRangeReportSave.min,
+						dateRangeReportSave.max, dateRangeReportSave.average,
+						dateRangeReportSave.percents, dateRangeReportSave.percentLabels);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			arg0.setScene(getSaveFileScene(arg0));
+		});
+		
 		return tableInner;
 	}
 
